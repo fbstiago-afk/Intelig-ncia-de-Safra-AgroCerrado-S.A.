@@ -1,0 +1,60 @@
+table Dim_Regiao
+	lineageTag: 4f205ab7-7f8e-5280-a8e6-3dd7bc0209c5
+
+	column RegiaoKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: f07c9235-6664-5f2d-9736-2b775453e7f5
+		summarizeBy: none
+		sourceColumn: RegiaoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column UF
+		dataType: string
+		lineageTag: 91d10db7-3d68-5159-8ad4-407c7eb08264
+		summarizeBy: none
+		sourceColumn: UF
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: c5fc6652-7b36-517b-8e70-cd42b5e1f548
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Regiao
+		dataType: string
+		lineageTag: af1fc82e-87ce-5b0a-9a12-f2dbb7c20d68
+		summarizeBy: none
+		sourceColumn: Regiao
+
+		annotation SummarizationSetBy = Automatic
+
+	column Bioma
+		dataType: string
+		lineageTag: df8c1d85-8794-530d-89e4-26b9ed06d8c8
+		summarizeBy: none
+		sourceColumn: Bioma
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Regiao = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Dim_Regiao",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"RegiaoKey", "UF", "Estado", "Regiao", "Bioma"}),
+				    SemVazios = Table.SelectRows(Colunas, each [RegiaoKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"RegiaoKey", Int64.Type}, {"UF", type text}, {"Estado", type text}, {"Regiao", type text}, {"Bioma", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

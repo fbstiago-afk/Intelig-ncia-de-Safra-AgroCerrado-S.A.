@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "AgroCerrado"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ee3ee3a9-84b3-59d5-a1ff-9ec47de28969"
+  }
+}

@@ -1,0 +1,60 @@
+table Dim_Fornecedor
+	lineageTag: 1221daab-1c5d-5d86-854f-f2104526e8d4
+
+	column FornecedorKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 550c6cb5-679e-5db5-906a-6019c2eb1335
+		summarizeBy: none
+		sourceColumn: FornecedorKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeFornecedor
+		dataType: string
+		lineageTag: d2f4a48e-13b6-5de2-ad4f-d8ae0c2f1e73
+		summarizeBy: none
+		sourceColumn: NomeFornecedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoria
+		dataType: string
+		lineageTag: f172d961-52f7-52ea-a84f-b795acf33e20
+		summarizeBy: none
+		sourceColumn: Categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column UFFornecedor
+		dataType: string
+		lineageTag: fb8e93ce-7844-5952-af66-36116ea09434
+		summarizeBy: none
+		sourceColumn: UFFornecedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Porte
+		dataType: string
+		lineageTag: 1e8d281f-07f9-57ca-8994-4427076a4adf
+		summarizeBy: none
+		sourceColumn: Porte
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Fornecedor = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Dim_Fornecedor",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"FornecedorKey", "NomeFornecedor", "Categoria", "UFFornecedor", "Porte"}),
+				    SemVazios = Table.SelectRows(Colunas, each [FornecedorKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"FornecedorKey", Int64.Type}, {"NomeFornecedor", type text}, {"Categoria", type text}, {"UFFornecedor", type text}, {"Porte", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

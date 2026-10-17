@@ -1,0 +1,69 @@
+table Dim_Cultura
+	lineageTag: fb7969be-1fd4-55a3-bd77-9f303e52e892
+
+	column CulturaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 1d13cf67-d322-5cd6-8ad6-03b48a25fe98
+		summarizeBy: none
+		sourceColumn: CulturaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cultura
+		dataType: string
+		lineageTag: 5718ee4a-b929-566e-b335-40c3fce24c08
+		summarizeBy: none
+		sourceColumn: Cultura
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo
+		dataType: string
+		lineageTag: 0d14d531-fe4a-52b0-93ea-330a63aade94
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column CicloDias
+		dataType: int64
+		formatString: 0
+		lineageTag: b44e4e96-d9d5-576b-acf1-4a62b2cc93ee
+		summarizeBy: none
+		sourceColumn: CicloDias
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnidadeMedida
+		dataType: string
+		lineageTag: 83ec9e7d-5f15-5858-8a91-8680ad3ec51e
+		summarizeBy: none
+		sourceColumn: UnidadeMedida
+
+		annotation SummarizationSetBy = Automatic
+
+	column CategoriaComercial
+		dataType: string
+		lineageTag: fa8061ab-bd1b-502e-b600-ac58ccd3ec94
+		summarizeBy: none
+		sourceColumn: CategoriaComercial
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Cultura = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Dim_Cultura",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"CulturaKey", "Cultura", "Tipo", "CicloDias", "UnidadeMedida", "CategoriaComercial"}),
+				    SemVazios = Table.SelectRows(Colunas, each [CulturaKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"CulturaKey", Int64.Type}, {"Cultura", type text}, {"Tipo", type text}, {"CicloDias", Int64.Type}, {"UnidadeMedida", type text}, {"CategoriaComercial", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

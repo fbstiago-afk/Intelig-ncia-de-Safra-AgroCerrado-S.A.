@@ -1,0 +1,104 @@
+table Dim_Fazenda
+	lineageTag: 70ac9b25-db63-54e9-ab1a-667f43f925a4
+
+	column FazendaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: ea604608-0507-5d34-9e51-e391de4c5bfd
+		summarizeBy: none
+		sourceColumn: FazendaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeFazenda
+		dataType: string
+		lineageTag: 7a53fb63-6872-504d-8627-70fbd262e66b
+		summarizeBy: none
+		sourceColumn: NomeFazenda
+
+		annotation SummarizationSetBy = Automatic
+
+	column Municipio
+		dataType: string
+		lineageTag: 2ef57cc8-1c57-5bf4-9867-a93ad3fec25a
+		summarizeBy: none
+		sourceColumn: Municipio
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegiaoKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: a7106248-bf3e-541c-bea7-a5f49b2263f7
+		summarizeBy: none
+		sourceColumn: RegiaoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column AreaTotalHa
+		dataType: double
+		formatString: #,0
+		lineageTag: bb5cc767-3e34-5345-a0eb-8ecb738f843c
+		summarizeBy: none
+		sourceColumn: AreaTotalHa
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoAquisicao
+		dataType: int64
+		formatString: 0
+		lineageTag: 63731f6b-2a99-5857-9bcb-fb2e0fce6bc2
+		summarizeBy: none
+		sourceColumn: AnoAquisicao
+
+		annotation SummarizationSetBy = Automatic
+
+	column TipoPropriedade
+		dataType: string
+		lineageTag: 28af844d-27b0-58c2-8d92-4e2c8f04e982
+		summarizeBy: none
+		sourceColumn: TipoPropriedade
+
+		annotation SummarizationSetBy = Automatic
+
+	column UF
+		dataType: string
+		lineageTag: 88d548f0-9fc6-562c-ab25-d2be5d27059b
+		summarizeBy: none
+		sourceColumn: UF
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 39ccbf51-7a43-5edb-861c-7e29f37bfe9a
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Regiao
+		dataType: string
+		lineageTag: 849d1dd6-aca0-567e-a6c3-734452c589ec
+		summarizeBy: none
+		sourceColumn: Regiao
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Fazenda = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Dim_Fazenda",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"FazendaKey", "NomeFazenda", "Municipio", "RegiaoKey", "AreaTotalHa", "AnoAquisicao", "TipoPropriedade", "UF", "Estado", "Regiao"}),
+				    SemVazios = Table.SelectRows(Colunas, each [FazendaKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"FazendaKey", Int64.Type}, {"NomeFazenda", type text}, {"Municipio", type text}, {"RegiaoKey", Int64.Type}, {"AreaTotalHa", type number}, {"AnoAquisicao", Int64.Type}, {"TipoPropriedade", type text}, {"UF", type text}, {"Estado", type text}, {"Regiao", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

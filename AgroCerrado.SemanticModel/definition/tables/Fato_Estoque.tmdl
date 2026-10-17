@@ -1,0 +1,85 @@
+table Fato_Estoque
+	lineageTag: 29f873e3-8f51-5921-a387-449b87c4a0f5
+
+	column EstoqueKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 69f0e64c-41fa-581d-a3f6-b851a91ebd96
+		summarizeBy: none
+		sourceColumn: EstoqueKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 38548370-9d02-588a-869f-e681ff682502
+		summarizeBy: none
+		sourceColumn: DataKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FazendaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 33b5a8f9-16eb-5a76-843d-23c7f476df72
+		summarizeBy: none
+		sourceColumn: FazendaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CulturaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 704184f0-c576-50a0-bffc-cead7cb8682c
+		summarizeBy: none
+		sourceColumn: CulturaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column VolumeSc
+		dataType: double
+		formatString: #,0
+		lineageTag: 2aeba313-bdb4-563a-b90c-0647a1d3f9ed
+		summarizeBy: sum
+		sourceColumn: VolumeSc
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustoMedioUnitario
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: ddfe4dd3-164c-5596-93f9-4df7561d5fd3
+		summarizeBy: sum
+		sourceColumn: CustoMedioUnitario
+
+		annotation SummarizationSetBy = Automatic
+
+	column ValorEstoque
+		dataType: double
+		formatString: \R$ #,0
+		lineageTag: e7028030-126c-5f73-81dd-03fc9ba58dee
+		summarizeBy: sum
+		sourceColumn: ValorEstoque
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Estoque = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Fato_Estoque",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"EstoqueKey", "DataKey", "FazendaKey", "CulturaKey", "VolumeSc", "CustoMedioUnitario", "ValorEstoque"}),
+				    SemVazios = Table.SelectRows(Colunas, each [EstoqueKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"EstoqueKey", Int64.Type}, {"DataKey", Int64.Type}, {"FazendaKey", Int64.Type}, {"CulturaKey", Int64.Type}, {"VolumeSc", type number}, {"CustoMedioUnitario", type number}, {"ValorEstoque", type number}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

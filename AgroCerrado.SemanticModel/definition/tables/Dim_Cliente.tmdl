@@ -1,0 +1,68 @@
+table Dim_Cliente
+	lineageTag: 4cae55ed-4a2e-5149-9859-8c73c0483d63
+
+	column ClienteKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: c4eb77d7-584d-57ca-8fe1-0ee94593fc09
+		summarizeBy: none
+		sourceColumn: ClienteKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeCliente
+		dataType: string
+		lineageTag: 5734136a-f890-5c7d-93c8-e94b44b11600
+		summarizeBy: none
+		sourceColumn: NomeCliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column TipoCliente
+		dataType: string
+		lineageTag: 2b6d8a4b-6885-5b68-92a4-70c941a14814
+		summarizeBy: none
+		sourceColumn: TipoCliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column UFCliente
+		dataType: string
+		lineageTag: 00625e95-aa7a-51f5-9ce1-46dc2dc6e7da
+		summarizeBy: none
+		sourceColumn: UFCliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Porte
+		dataType: string
+		lineageTag: 48442f5b-b2ed-507f-a9af-ed1db9d45367
+		summarizeBy: none
+		sourceColumn: Porte
+
+		annotation SummarizationSetBy = Automatic
+
+	column Canal
+		dataType: string
+		lineageTag: bcdbc81e-4158-5dd7-a6e2-f802dc1e39f5
+		summarizeBy: none
+		sourceColumn: Canal
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Cliente = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Dim_Cliente",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"ClienteKey", "NomeCliente", "TipoCliente", "UFCliente", "Porte", "Canal"}),
+				    SemVazios = Table.SelectRows(Colunas, each [ClienteKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"ClienteKey", Int64.Type}, {"NomeCliente", type text}, {"TipoCliente", type text}, {"UFCliente", type text}, {"Porte", type text}, {"Canal", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

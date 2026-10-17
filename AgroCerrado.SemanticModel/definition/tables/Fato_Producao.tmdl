@@ -1,0 +1,119 @@
+table Fato_Producao
+	lineageTag: 119e29f7-8627-5be8-a453-60c21e699712
+
+	column ProducaoKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 5be22f1c-d010-5b70-93b0-d3a18a3d4dc2
+		summarizeBy: none
+		sourceColumn: ProducaoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: b1e379c5-1005-5226-9292-6076061f5be1
+		summarizeBy: none
+		sourceColumn: DataKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FazendaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: e67d040b-c7a0-5859-853a-297c12660880
+		summarizeBy: none
+		sourceColumn: FazendaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CulturaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 742dc28a-19dc-5a1f-9053-973e1878401e
+		summarizeBy: none
+		sourceColumn: CulturaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Safra
+		dataType: string
+		lineageTag: 1963b65a-61ef-5c1e-9c55-d5bb8c46ae03
+		summarizeBy: none
+		sourceColumn: Safra
+
+		annotation SummarizationSetBy = Automatic
+
+	column AreaPlantadaHa
+		dataType: double
+		formatString: #,0
+		lineageTag: 70113da0-dd95-5250-9d05-0de1f3e14cf3
+		summarizeBy: sum
+		sourceColumn: AreaPlantadaHa
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProdutividadeScHa
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 98386ec8-3412-5fa2-ae37-e91f60a4340a
+		summarizeBy: sum
+		sourceColumn: ProdutividadeScHa
+
+		annotation SummarizationSetBy = Automatic
+
+	column VolumeSc
+		dataType: double
+		formatString: #,0
+		lineageTag: 2539d48f-578c-5b47-8031-3a3ccc71a1e3
+		summarizeBy: sum
+		sourceColumn: VolumeSc
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustoProducaoHa
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: 6001cd3b-b843-52d2-be71-a25e5ff0e780
+		summarizeBy: sum
+		sourceColumn: CustoProducaoHa
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustoTotal
+		dataType: double
+		formatString: \R$ #,0
+		lineageTag: 72999f27-99f6-53e1-98b7-2b82e365f5af
+		summarizeBy: sum
+		sourceColumn: CustoTotal
+
+		annotation SummarizationSetBy = Automatic
+
+	column TipoSafra
+		dataType: string
+		lineageTag: d9e04e34-5666-50f6-9d7c-ad46b1a6bfce
+		summarizeBy: none
+		sourceColumn: TipoSafra
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Producao = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Fato_Producao",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"ProducaoKey", "DataKey", "FazendaKey", "CulturaKey", "Safra", "AreaPlantadaHa", "ProdutividadeScHa", "VolumeSc", "CustoProducaoHa", "CustoTotal", "TipoSafra"}),
+				    SemVazios = Table.SelectRows(Colunas, each [ProducaoKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"ProducaoKey", Int64.Type}, {"DataKey", Int64.Type}, {"FazendaKey", Int64.Type}, {"CulturaKey", Int64.Type}, {"Safra", type text}, {"AreaPlantadaHa", type number}, {"ProdutividadeScHa", type number}, {"VolumeSc", type number}, {"CustoProducaoHa", type number}, {"CustoTotal", type number}, {"TipoSafra", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

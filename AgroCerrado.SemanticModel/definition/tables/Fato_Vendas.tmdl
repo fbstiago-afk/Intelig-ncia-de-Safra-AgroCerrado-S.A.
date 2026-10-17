@@ -1,0 +1,121 @@
+table Fato_Vendas
+	lineageTag: 646ac737-4ea5-54c6-9c29-edcd5f920f08
+
+	column VendaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 20ee0d64-8443-5d44-be54-edac791ac45d
+		summarizeBy: none
+		sourceColumn: VendaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 197832e1-60a3-5e41-b8be-2ba123cd8254
+		summarizeBy: none
+		sourceColumn: DataKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column FazendaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: a7791d8f-b2eb-538d-a305-c808764a0de7
+		summarizeBy: none
+		sourceColumn: FazendaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CulturaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: b203898b-4a09-5808-9996-4a2865e23ba3
+		summarizeBy: none
+		sourceColumn: CulturaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClienteKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 0a994da5-3527-569a-b780-a4bf9e7cc112
+		summarizeBy: none
+		sourceColumn: ClienteKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProducaoKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: c9749cd6-0a41-5141-a0b0-c3e159e2f599
+		summarizeBy: none
+		sourceColumn: ProducaoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column VolumeSc
+		dataType: double
+		formatString: #,0
+		lineageTag: 53eb9260-9210-5f0c-8aae-d84e8941d57b
+		summarizeBy: sum
+		sourceColumn: VolumeSc
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrecoUnitario
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: e1089486-da02-590b-9fef-b09c24b8c207
+		summarizeBy: sum
+		sourceColumn: PrecoUnitario
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReceitaBruta
+		dataType: double
+		formatString: \R$ #,0
+		lineageTag: 86185c47-a3fc-5d03-9128-0a352eabb47b
+		summarizeBy: sum
+		sourceColumn: ReceitaBruta
+
+		annotation SummarizationSetBy = Automatic
+
+	column TipoContrato
+		dataType: string
+		lineageTag: ef3b588a-a47c-59aa-9b59-6645188d5999
+		summarizeBy: none
+		sourceColumn: TipoContrato
+
+		annotation SummarizationSetBy = Automatic
+
+	column FreteIncluso
+		dataType: boolean
+		lineageTag: d8d96b9d-27e7-55bc-9a57-baa16fd8e5cc
+		summarizeBy: none
+		sourceColumn: FreteIncluso
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Vendas = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Fato_Vendas",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"VendaKey", "DataKey", "FazendaKey", "CulturaKey", "ClienteKey", "ProducaoKey", "VolumeSc", "PrecoUnitario", "ReceitaBruta", "TipoContrato", "FreteIncluso"}),
+				    SemVazios = Table.SelectRows(Colunas, each [VendaKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"VendaKey", Int64.Type}, {"DataKey", Int64.Type}, {"FazendaKey", Int64.Type}, {"CulturaKey", Int64.Type}, {"ClienteKey", Int64.Type}, {"ProducaoKey", Int64.Type}, {"VolumeSc", type number}, {"PrecoUnitario", type number}, {"ReceitaBruta", type number}, {"TipoContrato", type text}, {"FreteIncluso", type logical}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

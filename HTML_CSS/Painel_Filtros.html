@@ -1,0 +1,70 @@
+<!-- HTML Painel Filtros — template legível. Trechos «...» são expressões DAX concatenadas na medida [HTML Painel Filtros]. -->
+<style>*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333}
+
+#htmlViewer{overflow:hidden !important}
+
+.os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important}
+
+.mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif}
+
+@keyframes fu{from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:none}
+}
+
+@keyframes gw{from{width:0}
+}
+
+@keyframes dr{from{stroke-dashoffset:100}
+to{stroke-dashoffset:0}
+}
+
+@keyframes sh{0%{background-position:-200% 0}
+100%{background-position:200% 0}
+}
+
+.pn{position:absolute;inset:0;background:#FBFAF6;border-radius:22px 0 0 22px;box-shadow:-18px 0 40px rgba(14,42,18,.35);overflow:hidden;animation:si .55s cubic-bezier(.2,.8,.2,1) both}
+
+@keyframes si{from{transform:translateX(60px);opacity:0}
+to{transform:none;opacity:1}
+}
+
+.ph{height:92px;background:linear-gradient(120deg,#0E2A12,#1B5E20 60%,#2E7D32);padding:20px 22px;position:relative}
+
+.ph:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#C9A227,#F3D77A,#C9A227)}
+
+.ph b{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:19px;color:#fff;font-weight:800;display:block}
+
+.ph span{font-size:10px;color:#BFD8BA;letter-spacing:.04em}
+
+.x{position:absolute;left:84.0%;top:3.2%;width:11.0%;height:5.4%;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center}
+
+.ft{position:absolute;left:0;right:0;bottom:0;height:9.5%;border-top:1px solid #ECE6D4;background:#F4F1E7}
+
+.bt{position:absolute;top:91.8%;height:5.8%;border-radius:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;letter-spacing:.02em}
+
+.b1{left:6.0%;width:42.0%;border:1.5px solid #C9A227;color:#8A6D12;background:#fff}
+
+.b2{left:52.0%;width:42.0%;background:linear-gradient(135deg,#2E7D32,#1B5E20);color:#fff;box-shadow:0 6px 14px rgba(27,94,32,.35)}
+
+.sec{position:absolute;left:22px;right:22px;font-size:8.5px;letter-spacing:.18em;color:#8A7A40;font-weight:800}
+
+.sec:after{content:'';display:block;height:1px;background:#ECE6D4;margin-top:4px}
+</style>
+<div class='pn'>
+
+<div class='ph'><b>Filtros</b><span>Seleções sincronizadas entre as páginas</span></div>
+<div class='x'>✕</div>
+
+<div class='sec' style='top:13.2%'>TEMPO</div>
+
+<div class='sec' style='top:31.6%'>OPERAÇÃO</div>
+
+<div class='sec' style='top:68.2%'>COMERCIAL</div>
+
+<div class='ft'></div>
+
+<div class='bt b1'>↺ Limpar filtros</div>
+<div class='bt b2'>Aplicar ✓</div>
+</div>

@@ -1,0 +1,479 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "prodHeatmap",
+  "position": {
+    "x": 24,
+    "y": 80,
+    "z": 1010,
+    "height": 340,
+    "width": 620,
+    "tabOrder": 1010
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Fazenda"
+                    }
+                  },
+                  "Property": "NomeFazenda"
+                }
+              },
+              "queryRef": "Dim_Fazenda.NomeFazenda",
+              "nativeQueryRef": "NomeFazenda"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Cultura"
+                    }
+                  },
+                  "Property": "Cultura"
+                }
+              },
+              "queryRef": "Dim_Cultura.Cultura",
+              "nativeQueryRef": "Cultura"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Produtividade (un/ha)"
+                }
+              },
+              "queryRef": "_Medidas.Produtividade (un/ha)",
+              "nativeQueryRef": "Produtividade (un/ha)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Índice Produtividade vs Portfólio"
+                }
+              },
+              "queryRef": "_Medidas.Índice Produtividade vs Portfólio",
+              "nativeQueryRef": "Índice Produtividade vs Portfólio"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Área Plantada (ha)"
+                }
+              },
+              "queryRef": "_Medidas.Área Plantada (ha)",
+              "nativeQueryRef": "Área Plantada (ha)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vegaLite'"
+                }
+              }
+            },
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\n  \"data\": {\n    \"name\": \"dataset\"\n  },\n  \"transform\": [\n    {\n      \"filter\": \"isValid(datum[''Produtividade (un/ha)''])\"\n    },\n    {\n      \"calculate\": \"replace(datum[''NomeFazenda''], ''Fazenda '', '''')\",\n      \"as\": \"faz\"\n    },\n    {\n      \"calculate\": \"format(datum[''Produtividade (un/ha)''], ''.1f'')\",\n      \"as\": \"lbl\"\n    },\n    {\n      \"calculate\": \"datum[''Índice Produtividade vs Portfólio'']\",\n      \"as\": \"idx\"\n    }\n  ],\n  \"encoding\": {\n    \"x\": {\n      \"field\": \"Cultura\",\n      \"type\": \"nominal\",\n      \"sort\": [\n        \"Soja\",\n        \"Milho\",\n        \"Sorgo\",\n        \"Algodão\",\n        \"Milheto\"\n      ],\n      \"axis\": {\n        \"orient\": \"top\",\n        \"title\": null,\n        \"labelAngle\": 0,\n        \"labelFontSize\": 11,\n        \"labelFontWeight\": 700,\n        \"labelColor\": \"#1B5E20\",\n        \"labelPadding\": 6\n      }\n    },\n    \"y\": {\n      \"field\": \"faz\",\n      \"type\": \"nominal\",\n      \"sort\": {\n        \"op\": \"sum\",\n        \"field\": \"Área Plantada (ha)\",\n        \"order\": \"descending\"\n      },\n      \"axis\": {\n        \"title\": null,\n        \"labelFontSize\": 10.5,\n        \"labelColor\": \"#333333\",\n        \"labelPadding\": 8,\n        \"labelLimit\": 150\n      }\n    }\n  },\n  \"layer\": [\n    {\n      \"mark\": {\n        \"type\": \"rect\",\n        \"cornerRadius\": 7,\n        \"stroke\": \"#FFFFFF\",\n        \"strokeWidth\": 3,\n        \"tooltip\": true\n      },\n      \"encoding\": {\n        \"color\": {\n          \"field\": \"idx\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"domain\": [\n              0.85,\n              1,\n              1.15\n            ],\n            \"range\": [\n              \"#C9A227\",\n              \"#F4EFE1\",\n              \"#1B5E20\"\n            ],\n            \"clamp\": true\n          },\n          \"legend\": {\n            \"title\": \"Índice vs média da cultura (1,00 = média)\",\n            \"orient\": \"bottom\",\n            \"direction\": \"horizontal\",\n            \"gradientLength\": 260,\n            \"gradientThickness\": 8,\n            \"format\": \".2f\",\n            \"titleLimit\": 400\n          }\n        }\n      }\n    },\n    {\n      \"mark\": {\n        \"type\": \"text\",\n        \"tooltip\": true,\n        \"fontSize\": 11.5,\n        \"fontWeight\": 700\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"lbl\"\n        },\n        \"color\": {\n          \"condition\": {\n            \"test\": \"datum.idx > 1.07 || datum.idx < 0.9\",\n            \"value\": \"#FFFFFF\"\n          },\n          \"value\": \"#1B3A12\"\n        }\n      }\n    }\n  ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"autosize\": {\n    \"type\": \"fit\",\n    \"contains\": \"padding\"\n  },\n  \"view\": {\n    \"stroke\": \"transparent\"\n  },\n  \"font\": \"Segoe UI\",\n  \"padding\": 6,\n  \"axis\": {\n    \"domain\": false,\n    \"ticks\": false,\n    \"labelColor\": \"#5F6B5F\",\n    \"labelFontSize\": 10,\n    \"titleColor\": \"#5F6B5F\",\n    \"titleFontSize\": 10,\n    \"titleFontWeight\": 600,\n    \"gridColor\": \"#EEEAE0\",\n    \"labelFont\": \"Segoe UI\",\n    \"titleFont\": \"Segoe UI\"\n  },\n  \"legend\": {\n    \"labelColor\": \"#5F6B5F\",\n    \"titleColor\": \"#5F6B5F\",\n    \"labelFontSize\": 10,\n    \"titleFontSize\": 10,\n    \"titleFontWeight\": 600,\n    \"symbolStrokeWidth\": 0\n  },\n  \"text\": {\n    \"font\": \"Segoe UI\",\n    \"color\": \"#333333\"\n  }\n}'"
+                }
+              }
+            },
+            "renderMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'svg'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableHighlight": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Produtividade por fazenda × cultura'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1B5E20'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E8E2CF'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            },
+            "width": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0E2A12'"
+                    }
+                  }
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Outer'"
+                }
+              }
+            },
+            "preset": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Custom'"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            },
+            "shadowBlur": {
+              "expr": {
+                "Literal": {
+                  "Value": "18D"
+                }
+              }
+            },
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "angle": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Valor em sc/ha (algodão em @/ha) · cor = índice vs média do portfólio'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#6B756B'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Canvas'"
+                }
+              }
+            },
+            "section": {
+              "expr": {
+                "Literal": {
+                  "Value": "'ttFazenda'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Produtividade por fazenda × cultura'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

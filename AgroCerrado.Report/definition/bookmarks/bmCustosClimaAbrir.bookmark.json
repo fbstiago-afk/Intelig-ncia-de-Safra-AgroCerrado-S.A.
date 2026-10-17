@@ -1,0 +1,113 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "Abrir filtros · Custos, Rentabilidade & Clima",
+  "name": "bmCustosClimaAbrir",
+  "options": {
+    "targetVisualNames": [
+      "CustFltBackdrop",
+      "CustFltPainel",
+      "CustSlcAno",
+      "CustSlcSafra",
+      "CustSlcCultura",
+      "CustSlcUF",
+      "CustSlcNomeFazenda",
+      "CustSlcTipoPropriedade",
+      "CustSlcCanal",
+      "CustSlcTipoContrato",
+      "CustFltBtnX",
+      "CustFltBtnLimpar",
+      "CustFltBtnAplicar"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "pgCustosClima",
+    "sections": {
+      "pgCustosClima": {
+        "visualContainers": {
+          "CustFltBackdrop": {
+            "singleVisual": {
+              "visualType": "shape",
+              "objects": {}
+            }
+          },
+          "CustFltPainel": {
+            "singleVisual": {
+              "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+              "objects": {}
+            }
+          },
+          "CustSlcAno": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustSlcSafra": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustSlcCultura": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustSlcUF": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustSlcNomeFazenda": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustSlcTipoPropriedade": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustSlcCanal": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustSlcTipoContrato": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "CustFltBtnX": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "CustFltBtnLimpar": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "CustFltBtnAplicar": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          }
+        }
+      }
+    },
+    "objects": {}
+  }
+}

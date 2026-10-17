@@ -1,0 +1,113 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "Abrir filtros · Visão Executiva",
+  "name": "bmExecutivaAbrir",
+  "options": {
+    "targetVisualNames": [
+      "ExecFltBackdrop",
+      "ExecFltPainel",
+      "ExecSlcAno",
+      "ExecSlcSafra",
+      "ExecSlcCultura",
+      "ExecSlcUF",
+      "ExecSlcNomeFazenda",
+      "ExecSlcTipoPropriedade",
+      "ExecSlcCanal",
+      "ExecSlcTipoContrato",
+      "ExecFltBtnX",
+      "ExecFltBtnLimpar",
+      "ExecFltBtnAplicar"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "pgExecutiva",
+    "sections": {
+      "pgExecutiva": {
+        "visualContainers": {
+          "ExecFltBackdrop": {
+            "singleVisual": {
+              "visualType": "shape",
+              "objects": {}
+            }
+          },
+          "ExecFltPainel": {
+            "singleVisual": {
+              "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+              "objects": {}
+            }
+          },
+          "ExecSlcAno": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecSlcSafra": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecSlcCultura": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecSlcUF": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecSlcNomeFazenda": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecSlcTipoPropriedade": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecSlcCanal": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecSlcTipoContrato": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ExecFltBtnX": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "ExecFltBtnLimpar": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "ExecFltBtnAplicar": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          }
+        }
+      }
+    },
+    "objects": {}
+  }
+}

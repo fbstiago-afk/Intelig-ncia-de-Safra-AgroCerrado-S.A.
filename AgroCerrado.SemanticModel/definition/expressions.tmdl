@@ -1,0 +1,4 @@
+expression CaminhoBase = "E:\Projetos BI\13 - Agro Serrado\AgroCerrado_Dashboard\Dados\Base_AgroCerrado_PowerBI.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: b27ef638-6168-5964-a816-e58e8a65b737
+
+	annotation PBI_ResultType = Text

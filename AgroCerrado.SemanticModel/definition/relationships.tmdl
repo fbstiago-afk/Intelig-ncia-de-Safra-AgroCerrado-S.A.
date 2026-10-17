@@ -1,0 +1,67 @@
+relationship 1dce8540-73de-5244-b9bb-fbda59742819
+	fromColumn: Fato_Producao.DataKey
+	toColumn: Dim_Tempo.DataKey
+
+relationship c49e0fdd-15d1-5f00-9964-f6f90c130a4f
+	fromColumn: Fato_Producao.FazendaKey
+	toColumn: Dim_Fazenda.FazendaKey
+
+relationship 7e603b0c-c1da-5097-84eb-a7cccb9f291e
+	fromColumn: Fato_Producao.CulturaKey
+	toColumn: Dim_Cultura.CulturaKey
+
+relationship 09b7a5e1-aa87-5bb3-b213-2d79c0578182
+	fromColumn: Fato_Vendas.DataKey
+	toColumn: Dim_Tempo.DataKey
+
+relationship 37eb807f-9892-5073-8371-82c05b59c934
+	fromColumn: Fato_Vendas.ClienteKey
+	toColumn: Dim_Cliente.ClienteKey
+
+relationship e3b06b6c-a6b2-5f77-bdb4-2d2f5ca27c8f
+	fromColumn: Fato_Vendas.CulturaKey
+	toColumn: Dim_Cultura.CulturaKey
+
+relationship 6f078c8c-bf0d-5f18-9033-ec742d06fda6
+	fromColumn: Fato_Vendas.FazendaKey
+	toColumn: Dim_Fazenda.FazendaKey
+
+relationship 4cceaf2c-cbbb-5460-9027-1e4b2c1af783
+	fromColumn: Fato_Custos.DataKey
+	toColumn: Dim_Tempo.DataKey
+
+relationship 0a8f30d7-c551-560b-a8d1-bc58893a0a5d
+	fromColumn: Fato_Custos.FazendaKey
+	toColumn: Dim_Fazenda.FazendaKey
+
+relationship 02dd183e-6dd6-5171-9d68-a8b083d7f2b9
+	fromColumn: Fato_Custos.FornecedorKey
+	toColumn: Dim_Fornecedor.FornecedorKey
+
+relationship c5e20d7c-0961-5cf5-b3a8-1835fc582236
+	fromColumn: Fato_Estoque.DataKey
+	toColumn: Dim_Tempo.DataKey
+
+relationship 40943c06-b6d5-5ebf-b7d6-52a4aa38c20c
+	fromColumn: Fato_Estoque.FazendaKey
+	toColumn: Dim_Fazenda.FazendaKey
+
+relationship 51f3ff6b-d708-585e-afb2-794c3c8a0d18
+	fromColumn: Fato_Estoque.CulturaKey
+	toColumn: Dim_Cultura.CulturaKey
+
+relationship daa052c5-fc66-5cea-aa59-d8b1c22a2877
+	fromColumn: Fato_Clima.DataKey
+	toColumn: Dim_Tempo.DataKey
+
+relationship 2f045b41-1608-5cb6-843b-3d4a376e3d0a
+	fromColumn: Fato_Clima.RegiaoKey
+	toColumn: Dim_Regiao.RegiaoKey
+
+relationship 2992d90b-8bcf-5aa3-9992-a8cbf1b64b59
+	fromColumn: Dim_Fazenda.RegiaoKey
+	toColumn: Dim_Regiao.RegiaoKey
+
+relationship 3fab46cf-59e3-59f9-9404-65087b2bb7ae
+	fromColumn: Dim_Funcionario.FazendaKey
+	toColumn: Dim_Fazenda.FazendaKey

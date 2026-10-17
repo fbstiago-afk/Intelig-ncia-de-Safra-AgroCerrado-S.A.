@@ -1,0 +1,192 @@
+table Dim_Tempo
+	lineageTag: 5152c821-deae-551e-a8b9-c30b48085d1c
+	dataCategory: Time
+
+	column DataKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: c3bef511-5089-5a84-ae5d-ee22a2807ff8
+		summarizeBy: none
+		sourceColumn: DataKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data
+		dataType: dateTime
+		isKey
+		formatString: dd/mm/yyyy
+		lineageTag: 52aae9a4-691f-57b4-b2b3-f07848e9a42e
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: caae1c16-ad2a-52b3-b5ec-0a9f7feb8954
+		summarizeBy: none
+		sourceColumn: Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		dataType: int64
+		formatString: 0
+		lineageTag: 0953a24d-99c1-5fa1-9d67-a51876b29fc2
+		summarizeBy: none
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dia
+		dataType: int64
+		formatString: 0
+		lineageTag: f5cc6c03-1d91-52e4-ade3-0f2efc574528
+		summarizeBy: none
+		sourceColumn: Dia
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		dataType: int64
+		formatString: 0
+		lineageTag: d0e30fd3-9067-52b8-a630-c928f1a6827e
+		summarizeBy: none
+		sourceColumn: Trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Semestre
+		dataType: int64
+		formatString: 0
+		lineageTag: adc81018-a5ce-5d99-90ee-b59fda050d48
+		summarizeBy: none
+		sourceColumn: Semestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeMes
+		dataType: string
+		isHidden
+		lineageTag: 88fc51ef-aed7-5654-bf5c-5965d2a1af71
+		summarizeBy: none
+		sourceColumn: NomeMes
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeMesAbrev
+		dataType: string
+		isHidden
+		lineageTag: c88cf185-b7ef-5ed2-ad4c-7ae7c607b5ee
+		summarizeBy: none
+		sourceColumn: NomeMesAbrev
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeDiaSemana
+		dataType: string
+		isHidden
+		lineageTag: 4702a689-f1cb-5d88-91bb-d9e109bcef77
+		summarizeBy: none
+		sourceColumn: NomeDiaSemana
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiaSemana
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 44df76a3-b631-5a36-b990-332ff9ceb0c9
+		summarizeBy: none
+		sourceColumn: DiaSemana
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoMes
+		dataType: string
+		lineageTag: 382c9631-5ad0-5f87-9645-065055d1288f
+		summarizeBy: none
+		sourceColumn: AnoMes
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoTrimestre
+		dataType: string
+		lineageTag: 45480560-0acc-5a9d-bd97-a721a60d0d44
+		summarizeBy: none
+		sourceColumn: AnoTrimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Safra
+		dataType: string
+		lineageTag: c35dd661-3674-54de-868e-ecdf60aece9f
+		summarizeBy: none
+		sourceColumn: Safra
+
+		annotation SummarizationSetBy = Automatic
+
+	column EhFimDeSemana
+		dataType: boolean
+		lineageTag: ec3025a0-a584-5462-ac00-55c014eb1908
+		summarizeBy: none
+		sourceColumn: EhFimDeSemana
+
+		annotation SummarizationSetBy = Automatic
+
+	column EhFeriado
+		dataType: boolean
+		lineageTag: b662259c-f581-5c49-8e6f-0dd54b0069da
+		summarizeBy: none
+		sourceColumn: EhFeriado
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesAbrevPT
+		dataType: string
+		lineageTag: c471bd50-4bb8-5c8c-8d1a-6161113e7f97
+		summarizeBy: none
+		sourceColumn: MesAbrevPT
+		sortByColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesAno
+		dataType: string
+		lineageTag: 1a99d98a-4ab4-518d-b3f0-88dca0ba5b46
+		summarizeBy: none
+		sourceColumn: MesAno
+		sortByColumn: AnoMesNum
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnoMesNum
+		dataType: int64
+		formatString: 0
+		lineageTag: 1ee821ef-ff52-5b56-a041-54856f03d08f
+		summarizeBy: none
+		sourceColumn: AnoMesNum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Tempo = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Dim_Tempo",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"DataKey", "Data", "Ano", "Mes", "Dia", "Trimestre", "Semestre", "NomeMes", "NomeMesAbrev", "NomeDiaSemana", "DiaSemana", "AnoMes", "AnoTrimestre", "Safra", "EhFimDeSemana", "EhFeriado"}),
+				    SemVazios = Table.SelectRows(Colunas, each [DataKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"DataKey", Int64.Type}, {"Data", type date}, {"Ano", Int64.Type}, {"Mes", Int64.Type}, {"Dia", Int64.Type}, {"Trimestre", Int64.Type}, {"Semestre", Int64.Type}, {"NomeMes", type text}, {"NomeMesAbrev", type text}, {"NomeDiaSemana", type text}, {"DiaSemana", Int64.Type}, {"AnoMes", type text}, {"AnoTrimestre", type text}, {"Safra", type text}, {"EhFimDeSemana", type logical}, {"EhFeriado", type logical}}),
+				    MesesPT = {"jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"},
+				    AddMes = Table.AddColumn(Tipos, "MesAbrevPT", each MesesPT{[Mes]-1}, type text),
+				    AddMesAno = Table.AddColumn(AddMes, "MesAno", each [MesAbrevPT] & "/" & Text.End(Text.From([Ano]), 2), type text),
+				    AddNum = Table.AddColumn(AddMesAno, "AnoMesNum", each [Ano] * 100 + [Mes], Int64.Type)
+				in
+				    AddNum
+
+	annotation PBI_ResultType = Table

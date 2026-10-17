@@ -1,0 +1,26 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: pt-BR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["CaminhoBase", "Dim_Tempo", "Dim_Regiao", "Dim_Fazenda", "Dim_Cultura", "Dim_Cliente", "Dim_Fornecedor", "Dim_Funcionario", "Fato_Producao", "Fato_Vendas", "Fato_Custos", "Fato_Estoque", "Fato_Clima", "_Medidas"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+ref table _Medidas
+ref table Dim_Tempo
+ref table Dim_Regiao
+ref table Dim_Fazenda
+ref table Dim_Cultura
+ref table Dim_Cliente
+ref table Dim_Fornecedor
+ref table Dim_Funcionario
+ref table Fato_Producao
+ref table Fato_Vendas
+ref table Fato_Custos
+ref table Fato_Estoque
+ref table Fato_Clima

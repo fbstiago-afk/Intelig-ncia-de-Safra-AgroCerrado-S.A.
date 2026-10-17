@@ -1,0 +1,197 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "name": "dataset"
+  },
+  "transform": [
+    {
+      "filter": "isValid(datum['Chuva Média Mensal (mm)']) && isValid(datum['Produtividade Média (sc/ha)'])"
+    }
+  ],
+  "layer": [
+    {
+      "transform": [
+        {
+          "regression": "Produtividade Média (sc/ha)",
+          "on": "Chuva Média Mensal (mm)"
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "color": "#C9A227",
+        "strokeDash": [
+          6,
+          5
+        ],
+        "strokeWidth": 2.2
+      },
+      "encoding": {
+        "x": {
+          "field": "Chuva Média Mensal (mm)",
+          "type": "quantitative",
+          "scale": {
+            "zero": false,
+            "nice": true
+          },
+          "axis": {
+            "title": "Chuva média mensal (mm)",
+            "grid": true,
+            "tickCount": 6
+          }
+        },
+        "y": {
+          "field": "Produtividade Média (sc/ha)",
+          "type": "quantitative",
+          "scale": {
+            "zero": false,
+            "nice": true
+          },
+          "axis": {
+            "title": "Produtividade de grãos (sc/ha)",
+            "grid": true,
+            "tickCount": 6
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "opacity": 0.92,
+        "stroke": "#FFFFFF",
+        "strokeWidth": 2,
+        "tooltip": true
+      },
+      "encoding": {
+        "x": {
+          "field": "Chuva Média Mensal (mm)",
+          "type": "quantitative",
+          "scale": {
+            "zero": false,
+            "nice": true
+          },
+          "axis": {
+            "title": "Chuva média mensal (mm)",
+            "grid": true,
+            "tickCount": 6
+          }
+        },
+        "y": {
+          "field": "Produtividade Média (sc/ha)",
+          "type": "quantitative",
+          "scale": {
+            "zero": false,
+            "nice": true
+          },
+          "axis": {
+            "title": "Produtividade de grãos (sc/ha)",
+            "grid": true,
+            "tickCount": 6
+          }
+        },
+        "size": {
+          "field": "Área Grãos (ha)",
+          "type": "quantitative",
+          "scale": {
+            "range": [
+              180,
+              1100
+            ]
+          },
+          "legend": null
+        },
+        "color": {
+          "field": "Safra",
+          "type": "ordinal",
+          "scale": {
+            "range": [
+              "#A5D6A7",
+              "#2E7D32",
+              "#1B5E20",
+              "#C9A227"
+            ]
+          },
+          "legend": {
+            "title": "Safra",
+            "orient": "top",
+            "direction": "horizontal",
+            "symbolSize": 120
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "tooltip": true,
+        "fontSize": 9.5,
+        "fontWeight": 800,
+        "color": "#1B3A12",
+        "baseline": "bottom",
+        "dy": -11
+      },
+      "encoding": {
+        "x": {
+          "field": "Chuva Média Mensal (mm)",
+          "type": "quantitative",
+          "scale": {
+            "zero": false,
+            "nice": true
+          },
+          "axis": {
+            "title": "Chuva média mensal (mm)",
+            "grid": true,
+            "tickCount": 6
+          }
+        },
+        "y": {
+          "field": "Produtividade Média (sc/ha)",
+          "type": "quantitative",
+          "scale": {
+            "zero": false,
+            "nice": true
+          },
+          "axis": {
+            "title": "Produtividade de grãos (sc/ha)",
+            "grid": true,
+            "tickCount": 6
+          }
+        },
+        "text": {
+          "field": "UF"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "regression": "Produtividade Média (sc/ha)",
+          "on": "Chuva Média Mensal (mm)",
+          "params": true
+        },
+        {
+          "calculate": "'R² = ' + format(datum.rSquared, '.2f') + '  ·  tendência linear'",
+          "as": "r2"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "tooltip": true,
+        "align": "right",
+        "baseline": "top",
+        "x": {
+          "expr": "width"
+        },
+        "y": 2,
+        "fontSize": 10,
+        "fontWeight": 700,
+        "color": "#8A7A40"
+      },
+      "encoding": {
+        "text": {
+          "field": "r2"
+        }
+      }
+    }
+  ]
+}

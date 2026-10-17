@@ -1,0 +1,135 @@
+<!-- HTML KPIs Custos — template legível. Trechos «...» são expressões DAX concatenadas na medida [HTML KPIs Custos]. -->
+<style>*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333}
+
+#htmlViewer{overflow:hidden !important}
+
+.os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important}
+
+.mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif}
+
+@keyframes fu{from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:none}
+}
+
+@keyframes gw{from{width:0}
+}
+
+@keyframes dr{from{stroke-dashoffset:100}
+to{stroke-dashoffset:0}
+}
+
+@keyframes sh{0%{background-position:-200% 0}
+100%{background-position:200% 0}
+}
+
+.wr{position:absolute;inset:4px 2px 2px 2px;display:flex;gap:12px}
+
+.cd{position:relative;flex:1;min-width:0;background:rgba(255,255,255,.96);border:1px solid #E8E2CF;border-radius:16px;padding:12px 14px 10px 18px;overflow:hidden;box-shadow:0 6px 18px rgba(14,42,18,.08);animation:fu .7s cubic-bezier(.2,.7,.2,1) both;transition:transform .35s,box-shadow .35s,border-color .35s}
+
+.cd:before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#C9A227,#1B5E20)}
+
+.cd:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(14,42,18,.18);border-color:#C9A227}
+
+.cd:nth-child(2){animation-delay:.08s}
+.cd:nth-child(3){animation-delay:.16s}
+.cd:nth-child(4){animation-delay:.24s}
+.cd:nth-child(5){animation-delay:.32s}
+.cd:nth-child(6){animation-delay:.40s}
+
+.lb{font-size:9.5px;letter-spacing:.13em;color:#5F6B5F;font-weight:700;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.vl{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:25px;font-weight:800;color:#1B5E20;line-height:1.15;margin-top:5px;white-space:nowrap}
+
+.vl small{font-size:12px;font-weight:700;color:#2E7D32;margin-left:2px}
+
+.rw{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:9.5px;color:#6B756B;white-space:nowrap}
+
+.d{font-weight:700;padding:2px 7px;border-radius:20px;font-size:9.5px}
+
+.up{background:#E6F2E4;color:#1B5E20}
+.dn{background:#FBE9E5;color:#B23B2E}
+.nt{background:#F1EEE4;color:#7A6A3A}
+
+.vz{position:absolute;left:18px;right:14px;bottom:10px;height:20px}
+
+.br{height:7px;border-radius:7px;background:#EEF3EC;overflow:hidden;display:flex;margin-top:7px}
+
+.br span{display:block;height:100%;animation:gw 1.3s cubic-bezier(.2,.7,.2,1) .3s both}
+
+.lgd{display:flex;gap:8px;font-size:8.5px;color:#6B756B;margin-top:3px;white-space:nowrap}
+
+.lgd i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px}
+
+.sp polyline{stroke-dasharray:100;animation:dr 1.8s ease-out .35s both}
+
+.dt{position:absolute;inset:0;background:linear-gradient(135deg,#1B5E20,#0E2A12);color:#fff;padding:12px 14px 10px 18px;opacity:0;transform:translateY(10px);transition:all .35s;font-size:10.5px;line-height:1.55}
+
+.cd:hover .dt{opacity:1;transform:none}
+
+.dt .k{font-size:9px;letter-spacing:.14em;color:#C9A227;font-weight:800;margin-bottom:3px}
+
+.dt b{color:#F0D27A;font-weight:700}
+
+.mk{position:relative}
+.mk u{position:absolute;top:-3px;width:2px;height:13px;background:#B23B2E;border-radius:2px}
+
+.vl{font-size:22px}
+</style>
+<div class='wr'>
+
+<div class='cd'>
+<div class='lb'>Custo de produção</div>
+<div class='vl'>«"R$ " & FORMAT ( DIVIDE ( [Custo de Produção], 1000000 ), "#,0.0" ) & " mi"»</div>
+
+<div class='rw'><span>R$ «FORMAT([Custo por Hectare],"#,0")»/ha no período</span></div>
+
+<div class='dt'>
+<div class='k'>CUSTO · DETALHE</div>Grãos: <b>R$ «FORMAT([Custo por Hectare Grãos],"#,0")»/ha</b><br>Ano ref.: «IF ( ISBLANK ( [Custo por Hectare YoY %] ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( [Custo por Hectare YoY %] >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( [Custo por Hectare YoY %] ), "0.0%" ) & "</span>" )» no custo/ha</div></div>
+
+<div class='cd'>
+<div class='lb'>Desembolso</div>
+<div class='vl'>«"R$ " & FORMAT ( DIVIDE ( [Desembolso Operacional], 1000000 ), "#,0.0" ) & " mi"»</div>
+
+<div class='rw'><span>maior peso: <b style='color:#1B5E20'>«[Maior Categoria de Custo]»</b></span></div>
+
+<div class='dt'>
+<div class='k'>DESEMBOLSO · DETALHE</div>«[Maior Categoria de Custo]»: <b>«FORMAT(CALCULATE([% do Desembolso],TOPN(1,VALUES(Fato_Custos[CategoriaCusto]),[Desembolso Operacional],DESC)),"0%")»</b> do total<br>Variável: <b>«FORMAT([% Custo Variável],"0%")»</b> · Fixo: <b>«FORMAT(1-[% Custo Variável],"0%")»</b></div></div>
+
+<div class='cd'>
+<div class='lb'>Margem bruta</div>
+<div class='vl'>«"R$ " & FORMAT ( DIVIDE ( [Margem Bruta], 1000000 ), "#,0.0" ) & " mi"»</div>
+
+<div class='rw'><span class='d «IF([Margem Bruta %]>=0,"up","dn")»'>«FORMAT([Margem Bruta %],"0.0%")»</span><span>R$ «FORMAT([Margem por Hectare],"#,0")»/ha</span></div>
+
+<div class='dt'>
+<div class='k'>MARGEM · DETALHE</div>Receita: <b>«"R$ " & FORMAT ( DIVIDE ( [Receita Bruta], 1000000 ), "#,0.0" ) & " mi"»</b><br>Custo produção: <b>«"R$ " & FORMAT ( DIVIDE ( [Custo de Produção], 1000000 ), "#,0.0" ) & " mi"»</b></div></div>
+
+<div class='cd'>
+<div class='lb'>Break-even grãos</div>
+<div class='vl'>«FORMAT([Break-even (sc/ha)],"#,0.0")»<small>sc/ha</small></div>
+
+<div class='rw'><span class='d up'>+«FORMAT([Margem de Segurança (sc/ha)],"#,0.0")» sc/ha</span><span>de folga</span></div>
+
+<div class='dt'>
+<div class='k'>BREAK-EVEN · COMO LER</div>Custo/ha grãos ÷ preço médio (R$ «FORMAT([Preço Médio Grãos (R$/sc)],"#,0.00")»/sc). Produtividade atual: <b>«FORMAT([Produtividade Média (sc/ha)],"#,0.0")» sc/ha</b></div></div>
+
+<div class='cd'>
+<div class='lb'>Clima · chuva média</div>
+<div class='vl'>«FORMAT([Chuva Média Mensal (mm)],"#,0")»<small>mm/mês</small></div>
+
+<div class='rw'><span>«FORMAT([Temperatura Média (°C)],"0.0")» °C · UR «FORMAT([Umidade Relativa Média],"0")»%</span></div>
+
+<div class='dt'>
+<div class='k'>CLIMA · DETALHE</div>Dias de chuva: <b>«FORMAT([Dias de Chuva (média/mês)],"0.0")»/mês</b><br>Acumulado: <b>«FORMAT([Precipitação Acumulada (mm)],"#,0")» mm</b></div></div>
+
+<div class='cd'>
+<div class='lb'>Chuva × produtividade</div>
+<div class='vl'>r = «FORMAT([Correlação Chuva x Produtividade (r)],"0.00")»</div>
+
+<div class='rw' style='white-space:normal;line-height:1.25'><span>«[Leitura da Correlação]»</span></div>
+
+<div class='dt'>
+<div class='k'>CORRELAÇÃO · MÉTODO</div>Pearson entre chuva média mensal e produtividade de grãos por <b>UF × Safra</b> (ver dispersão ao lado).</div></div>
+</div>

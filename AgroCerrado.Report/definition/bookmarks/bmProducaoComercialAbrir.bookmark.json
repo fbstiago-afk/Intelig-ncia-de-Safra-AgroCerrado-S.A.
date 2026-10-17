@@ -1,0 +1,113 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/1.4.0/schema.json",
+  "displayName": "Abrir filtros · Produção & Comercial",
+  "name": "bmProducaoComercialAbrir",
+  "options": {
+    "targetVisualNames": [
+      "ProdFltBackdrop",
+      "ProdFltPainel",
+      "ProdSlcAno",
+      "ProdSlcSafra",
+      "ProdSlcCultura",
+      "ProdSlcUF",
+      "ProdSlcNomeFazenda",
+      "ProdSlcTipoPropriedade",
+      "ProdSlcCanal",
+      "ProdSlcTipoContrato",
+      "ProdFltBtnX",
+      "ProdFltBtnLimpar",
+      "ProdFltBtnAplicar"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "pgProducaoComercial",
+    "sections": {
+      "pgProducaoComercial": {
+        "visualContainers": {
+          "ProdFltBackdrop": {
+            "singleVisual": {
+              "visualType": "shape",
+              "objects": {}
+            }
+          },
+          "ProdFltPainel": {
+            "singleVisual": {
+              "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+              "objects": {}
+            }
+          },
+          "ProdSlcAno": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdSlcSafra": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdSlcCultura": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdSlcUF": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdSlcNomeFazenda": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdSlcTipoPropriedade": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdSlcCanal": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdSlcTipoContrato": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "ProdFltBtnX": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "ProdFltBtnLimpar": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "ProdFltBtnAplicar": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          }
+        }
+      }
+    },
+    "objects": {}
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "name": "dataset"
+  },
+  "transform": [
+    {
+      "filter": "isValid(datum['Receita Bruta'])"
+    },
+    {
+      "window": [
+        {
+          "op": "row_number",
+          "as": "rk"
+        }
+      ],
+      "sort": [
+        {
+          "field": "Receita Bruta",
+          "order": "descending"
+        }
+      ]
+    },
+    {
+      "joinaggregate": [
+        {
+          "op": "max",
+          "field": "Receita Bruta",
+          "as": "mx"
+        }
+      ]
+    },
+    {
+      "calculate": "replace(datum['NomeFazenda'], 'Fazenda ', '')",
+      "as": "faz"
+    },
+    {
+      "calculate": "'R$ ' + format(datum['Receita Bruta'] / 1e6, ',.0f') + ' mi'",
+      "as": "lbl"
+    },
+    {
+      "calculate": "'mg ' + format(datum['Margem Bruta %'], '.0%')",
+      "as": "mg"
+    },
+    {
+      "calculate": "datum.mx * 1.55",
+      "as": "pad"
+    }
+  ],
+  "encoding": {
+    "y": {
+      "field": "faz",
+      "type": "nominal",
+      "sort": {
+        "field": "rk",
+        "order": "ascending"
+      },
+      "axis": {
+        "title": null,
+        "labelFontSize": 11,
+        "labelColor": "#333333",
+        "labelPadding": 10,
+        "labelLimit": 150,
+        "labelFontWeight": 600
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "rule",
+        "strokeWidth": 5,
+        "strokeCap": "round",
+        "color": "#DDE9D6"
+      },
+      "encoding": {
+        "x": {
+          "field": "Receita Bruta",
+          "type": "quantitative",
+          "axis": null
+        },
+        "x2": {
+          "datum": 0
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "rule",
+        "strokeWidth": 5,
+        "strokeCap": "round",
+        "opacity": 0.55
+      },
+      "encoding": {
+        "x": {
+          "field": "Receita Bruta",
+          "type": "quantitative",
+          "axis": null
+        },
+        "x2": {
+          "datum": 0
+        },
+        "color": {
+          "condition": {
+            "test": "datum.rk <= 3",
+            "value": "#C9A227"
+          },
+          "value": "#2E7D32"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "size": 260,
+        "opacity": 1,
+        "stroke": "#FFFFFF",
+        "strokeWidth": 2.5,
+        "tooltip": true
+      },
+      "encoding": {
+        "x": {
+          "field": "Receita Bruta",
+          "type": "quantitative",
+          "axis": null
+        },
+        "color": {
+          "condition": {
+            "test": "datum.rk <= 3",
+            "value": "#C9A227"
+          },
+          "value": "#1B5E20"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "tooltip": true,
+        "align": "center",
+        "baseline": "middle",
+        "fontSize": 8.5,
+        "fontWeight": 800,
+        "color": "#FFFFFF"
+      },
+      "encoding": {
+        "x": {
+          "field": "Receita Bruta",
+          "type": "quantitative",
+          "axis": null
+        },
+        "text": {
+          "field": "rk"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "tooltip": true,
+        "align": "left",
+        "dx": 15,
+        "fontSize": 11,
+        "fontWeight": 700,
+        "color": "#1B5E20"
+      },
+      "encoding": {
+        "x": {
+          "field": "Receita Bruta",
+          "type": "quantitative",
+          "axis": null
+        },
+        "text": {
+          "field": "lbl"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "tooltip": true,
+        "align": "left",
+        "dx": 78,
+        "fontSize": 9.5,
+        "color": "#8A7A40"
+      },
+      "encoding": {
+        "x": {
+          "field": "Receita Bruta",
+          "type": "quantitative",
+          "axis": null
+        },
+        "text": {
+          "field": "mg"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "point",
+        "opacity": 0
+      },
+      "encoding": {
+        "x": {
+          "field": "pad",
+          "type": "quantitative",
+          "axis": null
+        }
+      }
+    }
+  ]
+}

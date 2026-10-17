@@ -1,0 +1,80 @@
+table Dim_Funcionario
+	lineageTag: 61f04b6a-46ba-525a-97ca-938cd07b7713
+
+	column FuncionarioKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 8bfbdb58-97db-59a3-910e-21fe08a99ff9
+		summarizeBy: none
+		sourceColumn: FuncionarioKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column NomeFuncionario
+		dataType: string
+		lineageTag: d2eaffac-057b-54a1-84f6-6b8694435380
+		summarizeBy: none
+		sourceColumn: NomeFuncionario
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cargo
+		dataType: string
+		lineageTag: c2fdac93-0665-5fe6-bb76-c885147079ce
+		summarizeBy: none
+		sourceColumn: Cargo
+
+		annotation SummarizationSetBy = Automatic
+
+	column FazendaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 30467656-8043-5b65-a10c-e70e7fcf5ef8
+		summarizeBy: none
+		sourceColumn: FazendaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataAdmissao
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: c0be9811-d582-50b0-8580-f43d4aba8f86
+		summarizeBy: none
+		sourceColumn: DataAdmissao
+
+		annotation SummarizationSetBy = Automatic
+
+	column SalarioBase
+		dataType: double
+		formatString: \R$ #,0.00
+		lineageTag: be1fe8c6-aff3-5825-ac1d-39ac19f8b0bd
+		summarizeBy: none
+		sourceColumn: SalarioBase
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 7e421664-ceef-5717-95be-cdbf48f0edb9
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Funcionario = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Dim_Funcionario",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"FuncionarioKey", "NomeFuncionario", "Cargo", "FazendaKey", "DataAdmissao", "SalarioBase", "Status"}),
+				    SemVazios = Table.SelectRows(Colunas, each [FuncionarioKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"FuncionarioKey", Int64.Type}, {"NomeFuncionario", type text}, {"Cargo", type text}, {"FazendaKey", Int64.Type}, {"DataAdmissao", type date}, {"SalarioBase", type number}, {"Status", type text}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table

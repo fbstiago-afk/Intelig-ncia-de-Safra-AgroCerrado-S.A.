@@ -1,0 +1,70 @@
+<!-- HTML Leitura Executiva — template legível. Trechos «...» são expressões DAX concatenadas na medida [HTML Leitura Executiva]. -->
+<style>*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333}
+
+#htmlViewer{overflow:hidden !important}
+
+.os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important}
+
+.mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif}
+
+@keyframes fu{from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:none}
+}
+
+@keyframes gw{from{width:0}
+}
+
+@keyframes dr{from{stroke-dashoffset:100}
+to{stroke-dashoffset:0}
+}
+
+@keyframes sh{0%{background-position:-200% 0}
+100%{background-position:200% 0}
+}
+
+.bx{position:absolute;inset:2px;background:rgba(255,255,255,.96);border:1px solid #E8E2CF;border-radius:16px;padding:14px 18px;box-shadow:0 6px 18px rgba(14,42,18,.08);animation:fu .8s .2s both}
+
+.hh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+
+.hh b{font-family:'Montserrat','Segoe UI Semibold',sans-serif;color:#1B5E20;font-size:14px;font-weight:800}
+
+.hh span{font-size:9.5px;letter-spacing:.14em;color:#8A7A40;font-weight:700}
+
+.gd{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+
+.it{display:flex;gap:10px;align-items:flex-start;font-size:11.2px;line-height:1.45;color:#3A423A;opacity:0;animation:fu .7s both}
+
+.it:nth-child(1){animation-delay:.35s}
+.it:nth-child(2){animation-delay:.5s}
+.it:nth-child(3){animation-delay:.65s}
+.it:nth-child(4){animation-delay:.8s}
+
+.nb{flex:none;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#F0D27A;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(201,162,39,.25)}
+
+.it b{color:#1B5E20}
+.it em{font-style:normal;color:#B23B2E;font-weight:700}
+</style>
+<div class='bx'>
+
+<div class='hh'><b>Leitura executiva</b><span>GERADA A PARTIR DOS FILTROS ATIVOS</span></div>
+
+<div class='gd'>
+
+<div class='it'>
+<div class='nb'>01</div>
+<div><b>«_tfN»</b> lidera a receita com «"R$ " & FORMAT ( DIVIDE ( _tfR, 1000000 ), "#,0.0" ) & " mi"» e margem de «FORMAT(_tfM,"0.0%")».</div></div>
+
+<div class='it'>
+<div class='nb'>02</div>
+<div><b>«_bN»</b> é a cultura mais rentável («FORMAT(_bM,"0.0%")» de margem); «IF(_wM<0,"<em>" & _wN & "</em> opera no prejuízo (" & FORMAT(_wM,"0.0%") & ")","<b>" & _wN & "</b> tem a menor margem (" & FORMAT(_wM,"0.0%") & ")")».</div></div>
+
+<div class='it'>
+<div class='nb'>03</div>
+<div><b>«_lfN»</b> tem a menor margem do portfólio («FORMAT(_lfM,"0.0%")») em «FORMAT(DIVIDE(_lfA,1000),"#,0.0")» mil ha — prioridade de revisão de custo e mix.</div></div>
+
+<div class='it'>
+<div class='nb'>04</div>
+<div>Exportação gera <b>«FORMAT([% Exportação],"0%")»</b> da receita e o Barter cobre <b>«FORMAT([% Barter],"0%")»</b> — proteção natural contra o custo de insumos.</div></div>
+</div></div>

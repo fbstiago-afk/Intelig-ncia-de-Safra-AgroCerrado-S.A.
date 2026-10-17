@@ -1,0 +1,120 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "name": "dataset"
+  },
+  "transform": [
+    {
+      "filter": "isValid(datum['Produtividade (un/ha)'])"
+    },
+    {
+      "calculate": "replace(datum['NomeFazenda'], 'Fazenda ', '')",
+      "as": "faz"
+    },
+    {
+      "calculate": "format(datum['Produtividade (un/ha)'], '.1f')",
+      "as": "lbl"
+    },
+    {
+      "calculate": "datum['Índice Produtividade vs Portfólio']",
+      "as": "idx"
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "Cultura",
+      "type": "nominal",
+      "sort": [
+        "Soja",
+        "Milho",
+        "Sorgo",
+        "Algodão",
+        "Milheto"
+      ],
+      "axis": {
+        "orient": "top",
+        "title": null,
+        "labelAngle": 0,
+        "labelFontSize": 11,
+        "labelFontWeight": 700,
+        "labelColor": "#1B5E20",
+        "labelPadding": 6
+      }
+    },
+    "y": {
+      "field": "faz",
+      "type": "nominal",
+      "sort": {
+        "op": "sum",
+        "field": "Área Plantada (ha)",
+        "order": "descending"
+      },
+      "axis": {
+        "title": null,
+        "labelFontSize": 10.5,
+        "labelColor": "#333333",
+        "labelPadding": 8,
+        "labelLimit": 150
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "rect",
+        "cornerRadius": 7,
+        "stroke": "#FFFFFF",
+        "strokeWidth": 3,
+        "tooltip": true
+      },
+      "encoding": {
+        "color": {
+          "field": "idx",
+          "type": "quantitative",
+          "scale": {
+            "domain": [
+              0.85,
+              1,
+              1.15
+            ],
+            "range": [
+              "#C9A227",
+              "#F4EFE1",
+              "#1B5E20"
+            ],
+            "clamp": true
+          },
+          "legend": {
+            "title": "Índice vs média da cultura (1,00 = média)",
+            "orient": "bottom",
+            "direction": "horizontal",
+            "gradientLength": 260,
+            "gradientThickness": 8,
+            "format": ".2f",
+            "titleLimit": 400
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "tooltip": true,
+        "fontSize": 11.5,
+        "fontWeight": 700
+      },
+      "encoding": {
+        "text": {
+          "field": "lbl"
+        },
+        "color": {
+          "condition": {
+            "test": "datum.idx > 1.07 || datum.idx < 0.9",
+            "value": "#FFFFFF"
+          },
+          "value": "#1B3A12"
+        }
+      }
+    }
+  ]
+}

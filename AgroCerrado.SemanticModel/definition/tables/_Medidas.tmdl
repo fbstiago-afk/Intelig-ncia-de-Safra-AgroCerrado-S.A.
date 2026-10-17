@@ -1,0 +1,1182 @@
+table _Medidas
+	lineageTag: d7ee8745-4885-5ace-9042-aa53d30a05a3
+
+	/// Área colhida somando safra de verão e safrinha.
+	measure 'Área Plantada (ha)' = SUM ( Fato_Producao[AreaPlantadaHa] )
+		formatString: #,0
+		displayFolder: 01 Produção
+		lineageTag: cf8bbaaf-1aea-5073-9326-294dfbcb6846
+
+	/// Área de culturas medidas em sacas de 60 kg (exclui algodão).
+	measure 'Área Grãos (ha)' = CALCULATE ( [Área Plantada (ha)], KEEPFILTERS ( Dim_Cultura[UnidadeMedida] = "sc 60kg" ) )
+		formatString: #,0
+		displayFolder: 01 Produção
+		lineageTag: 79223518-46dd-5d2a-b521-2dd9eddf2e26
+
+	/// Área física das propriedades.
+	measure 'Área Total Fazendas (ha)' = SUM ( Dim_Fazenda[AreaTotalHa] )
+		formatString: #,0
+		displayFolder: 01 Produção
+		lineageTag: a019e6e1-c8df-5c42-89b4-333b53da35b3
+
+	/// Volume colhido de grãos em sacas de 60 kg.
+	measure 'Produção Grãos (sc)' = CALCULATE ( SUM ( Fato_Producao[VolumeSc] ), KEEPFILTERS ( Dim_Cultura[UnidadeMedida] = "sc 60kg" ) )
+		formatString: #,0
+		displayFolder: 01 Produção
+		lineageTag: 0259bb22-23a7-519c-8e95-070be7a13517
+
+	/// Algodão em arrobas (unidade própria, não somada às sacas).
+	measure 'Produção Algodão (@)' = CALCULATE ( SUM ( Fato_Producao[VolumeSc] ), KEEPFILTERS ( Dim_Cultura[UnidadeMedida] = "arroba" ) )
+		formatString: #,0
+		displayFolder: 01 Produção
+		lineageTag: fb299c00-355b-5894-81ee-479a6d9104af
+
+	/// Produtividade ponderada pela área (grãos).
+	measure 'Produtividade Média (sc/ha)' = DIVIDE ( [Produção Grãos (sc)], [Área Grãos (ha)] )
+		formatString: #,0.0
+		displayFolder: 01 Produção
+		lineageTag: 92e674e4-85ea-5720-9979-f0f44ba6aa3b
+
+	/// Produtividade na unidade nativa da cultura (sc/ha ou @/ha).
+	measure 'Produtividade (un/ha)' = DIVIDE ( SUM ( Fato_Producao[VolumeSc] ), [Área Plantada (ha)] )
+		formatString: #,0.0
+		displayFolder: 01 Produção
+		lineageTag: 62e55a28-c2b0-5d3f-93c7-01cd0aa62718
+
+	/// 1,00 = média do portfólio para a mesma cultura e período.
+	measure 'Índice Produtividade vs Portfólio' = DIVIDE ( [Produtividade (un/ha)], CALCULATE ( [Produtividade (un/ha)], REMOVEFILTERS ( Dim_Fazenda ) ) )
+		formatString: 0.00
+		displayFolder: 01 Produção
+		lineageTag: 177b3e10-09a8-591f-bec6-9459cbe9891d
+
+	/// Área plantada no ano ÷ área física (>1 indica segunda safra).
+	measure 'Intensidade de Uso da Terra' = DIVIDE ( [Área Plantada (ha) (Ano Ref)], [Área Total Fazendas (ha)] )
+		formatString: 0.00"x"
+		displayFolder: 01 Produção
+		lineageTag: c04bb123-d97d-5d35-8874-34da90914e17
+
+	measure 'Área Verão (ha)' = CALCULATE ( [Área Plantada (ha)], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Verão" ) )
+		formatString: #,0
+		displayFolder: 01 Produção
+		lineageTag: c229376c-6403-5f1e-8c92-1c47ec83feff
+
+	measure 'Produtividade Verão (sc/ha)' = CALCULATE ( [Produtividade Média (sc/ha)], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Verão" ) )
+		formatString: #,0.0
+		displayFolder: 01 Produção
+		lineageTag: 0bd9007d-cb85-5ab5-baab-fa19af0bc369
+
+	measure 'Custo/ha Verão' = CALCULATE ( [Custo por Hectare], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Verão" ) )
+		formatString: \R$ #,0
+		displayFolder: 01 Produção
+		lineageTag: ede28397-efbe-5487-8e83-5ce1c2f29772
+
+	/// Receita das culturas do ciclo menos custo de produção do ciclo.
+	measure 'Margem % Verão' =
+			VAR _culturas = CALCULATETABLE ( VALUES ( Fato_Producao[CulturaKey] ), KEEPFILTERS ( Fato_Producao[TipoSafra] = "Verão" ) )
+			VAR _receita = CALCULATE ( [Receita Bruta], TREATAS ( _culturas, Dim_Cultura[CulturaKey] ) )
+			VAR _custo = CALCULATE ( [Custo de Produção], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Verão" ) )
+			RETURN DIVIDE ( _receita - _custo, _receita )
+		formatString: 0.0%
+		displayFolder: 01 Produção
+		lineageTag: 4e1e741e-4a3d-5c34-9753-0a300a2b7e6a
+
+	measure 'Área Safrinha (ha)' = CALCULATE ( [Área Plantada (ha)], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Safrinha" ) )
+		formatString: #,0
+		displayFolder: 01 Produção
+		lineageTag: d739ecc0-cee2-5e22-bc0e-8347729b2953
+
+	measure 'Produtividade Safrinha (sc/ha)' = CALCULATE ( [Produtividade Média (sc/ha)], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Safrinha" ) )
+		formatString: #,0.0
+		displayFolder: 01 Produção
+		lineageTag: f12873f8-9c7e-564d-aa7f-80dda0532bc4
+
+	measure 'Custo/ha Safrinha' = CALCULATE ( [Custo por Hectare], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Safrinha" ) )
+		formatString: \R$ #,0
+		displayFolder: 01 Produção
+		lineageTag: 2aee9666-b51c-5e28-8bbb-8510586950be
+
+	/// Receita das culturas do ciclo menos custo de produção do ciclo.
+	measure 'Margem % Safrinha' =
+			VAR _culturas = CALCULATETABLE ( VALUES ( Fato_Producao[CulturaKey] ), KEEPFILTERS ( Fato_Producao[TipoSafra] = "Safrinha" ) )
+			VAR _receita = CALCULATE ( [Receita Bruta], TREATAS ( _culturas, Dim_Cultura[CulturaKey] ) )
+			VAR _custo = CALCULATE ( [Custo de Produção], KEEPFILTERS ( Fato_Producao[TipoSafra] = "Safrinha" ) )
+			RETURN DIVIDE ( _receita - _custo, _receita )
+		formatString: 0.0%
+		displayFolder: 01 Produção
+		lineageTag: 82ff0e3d-86bc-5cde-a6b0-cc48b459dd6b
+
+	measure 'Receita Bruta' = SUM ( Fato_Vendas[ReceitaBruta] )
+		formatString: \R$ #,0
+		displayFolder: 02 Comercial
+		lineageTag: 1e064bce-d6ae-525d-934e-5dd69527db6c
+
+	measure 'Volume Vendido' = SUM ( Fato_Vendas[VolumeSc] )
+		formatString: #,0
+		displayFolder: 02 Comercial
+		lineageTag: 6369d023-1309-5156-975b-e4f115143598
+
+	/// Preço realizado ponderado pelo volume.
+	measure 'Preço Médio (R$/un)' = DIVIDE ( [Receita Bruta], [Volume Vendido] )
+		formatString: \R$ #,0.00
+		displayFolder: 02 Comercial
+		lineageTag: f5ac87ef-a18a-519c-864c-0a409c5c8125
+
+	measure 'Preço Médio Grãos (R$/sc)' = CALCULATE ( [Preço Médio (R$/un)], KEEPFILTERS ( Dim_Cultura[UnidadeMedida] = "sc 60kg" ) )
+		formatString: \R$ #,0.00
+		displayFolder: 02 Comercial
+		lineageTag: b2dc6d16-41df-590e-8540-23a12cb7e640
+
+	measure 'Nº Contratos' = COUNTROWS ( Fato_Vendas )
+		formatString: #,0
+		displayFolder: 02 Comercial
+		lineageTag: 698e1155-b8ff-5f7e-bb6a-68828a6443a0
+
+	measure 'Ticket Médio por Contrato' = DIVIDE ( [Receita Bruta], [Nº Contratos] )
+		formatString: \R$ #,0
+		displayFolder: 02 Comercial
+		lineageTag: cc9637ae-1495-547d-b0a6-77b56a611516
+
+	measure 'Receita Exportação' = CALCULATE ( [Receita Bruta], KEEPFILTERS ( Dim_Cliente[Canal] = "Exportação" ) )
+		formatString: \R$ #,0
+		displayFolder: 02 Comercial
+		lineageTag: c0b5e168-083b-58ea-a76a-6f76a2ac5967
+
+	measure '% Exportação' = DIVIDE ( [Receita Exportação], [Receita Bruta] )
+		formatString: 0.0%
+		displayFolder: 02 Comercial
+		lineageTag: c5a41bfd-6daa-5669-85c8-1f74bd8b4ad5
+
+	measure '% Barter' = DIVIDE ( CALCULATE ( [Receita Bruta], KEEPFILTERS ( Fato_Vendas[TipoContrato] = "Barter" ) ), [Receita Bruta] )
+		formatString: 0.0%
+		displayFolder: 02 Comercial
+		lineageTag: 149688ea-54f5-56b5-9531-5dd4aa3ab7cb
+
+	measure 'Share Receita Cliente %' = DIVIDE ( [Receita Bruta], CALCULATE ( [Receita Bruta], ALLSELECTED ( Dim_Cliente ) ) )
+		formatString: 0.0%
+		displayFolder: 02 Comercial
+		lineageTag: d73558a8-babc-5a27-b543-2ddd06fdee71
+
+	/// Participação no total da empresa para o mesmo período/fazendas.
+	measure 'Share Receita Total %' =
+			DIVIDE (
+			    [Receita Bruta],
+			    CALCULATE ( [Receita Bruta], REMOVEFILTERS ( Dim_Cliente ), REMOVEFILTERS ( Fato_Vendas[TipoContrato] ), REMOVEFILTERS ( Dim_Cultura ) )
+			)
+		formatString: 0.0%
+		displayFolder: 02 Comercial
+		lineageTag: 5fd12630-a5af-5c44-9e2d-47c4ba0bfe52
+
+	measure 'Ranking Cliente' = IF ( NOT ISBLANK ( [Receita Bruta] ), RANKX ( ALLSELECTED ( Dim_Cliente[NomeCliente] ), [Receita Bruta],, DESC, DENSE ) )
+		formatString: 0
+		displayFolder: 02 Comercial
+		lineageTag: eb53831f-034f-564b-89fc-a4c7427a86b9
+
+	measure 'Receita Top 8 Clientes' = IF ( [Ranking Cliente] <= 8, [Receita Bruta] )
+		formatString: \R$ #,0
+		displayFolder: 02 Comercial
+		lineageTag: 8bbbdd31-5716-5835-bf16-c19bfd1ead9f
+
+	measure 'Receita Mês Anterior' = CALCULATE ( [Receita Bruta], DATEADD ( Dim_Tempo[Data], -1, MONTH ) )
+		formatString: \R$ #,0
+		displayFolder: 02 Comercial
+		lineageTag: bcb982e7-5282-51b7-a7c8-f4cc6bee7a64
+
+	measure 'Receita MoM %' = DIVIDE ( [Receita Bruta] - [Receita Mês Anterior], [Receita Mês Anterior] )
+		formatString: 0.0%
+		displayFolder: 02 Comercial
+		lineageTag: 4116e788-55f1-55b3-94f0-37da8b39241e
+
+	measure 'Receita Mesmo Período AA' = CALCULATE ( [Receita Bruta], DATEADD ( Dim_Tempo[Data], -1, YEAR ) )
+		formatString: \R$ #,0
+		displayFolder: 02 Comercial
+		lineageTag: 1fc12d81-64e0-59cf-b735-4e8e3e24b1a6
+
+	measure 'Receita vs AA %' = DIVIDE ( [Receita Bruta] - [Receita Mesmo Período AA], [Receita Mesmo Período AA] )
+		formatString: 0.0%
+		displayFolder: 02 Comercial
+		lineageTag: 673ae1dd-67b7-53ae-b866-7e4900013396
+
+	measure 'Receita Acumulada no Ano' = TOTALYTD ( [Receita Bruta], Dim_Tempo[Data] )
+		formatString: \R$ #,0
+		displayFolder: 02 Comercial
+		lineageTag: b5ca5ecb-eacf-54d4-b938-c262a68e100d
+
+	measure 'Preço Médio Empresa (R$/un)' = CALCULATE ( [Preço Médio (R$/un)], REMOVEFILTERS ( Dim_Cliente ), REMOVEFILTERS ( Fato_Vendas[TipoContrato] ) )
+		formatString: \R$ #,0.00
+		displayFolder: 02 Comercial
+		lineageTag: e057d900-1ed3-5432-aa73-9d19230e928a
+
+	/// Custo total da safra (base para margem por cultura).
+	measure 'Custo de Produção' = SUM ( Fato_Producao[CustoTotal] )
+		formatString: \R$ #,0
+		displayFolder: 03 Custos
+		lineageTag: e48715cd-4caa-507c-895f-a2d9803c45b4
+
+	measure 'Custo por Hectare' = DIVIDE ( [Custo de Produção], [Área Plantada (ha)] )
+		formatString: \R$ #,0
+		displayFolder: 03 Custos
+		lineageTag: 24bbf723-bf0b-5071-b6ae-e7100650ed0e
+
+	measure 'Custo por Hectare Grãos' = CALCULATE ( [Custo por Hectare], KEEPFILTERS ( Dim_Cultura[UnidadeMedida] = "sc 60kg" ) )
+		formatString: \R$ #,0
+		displayFolder: 03 Custos
+		lineageTag: c5034ee8-53b6-526b-aa9a-e111835dbcf3
+
+	/// Lançamentos mensais por categoria/fornecedor.
+	measure 'Desembolso Operacional' = SUM ( Fato_Custos[Valor] )
+		formatString: \R$ #,0
+		displayFolder: 03 Custos
+		lineageTag: ca8804ec-d353-507d-b330-cddeed547819
+
+	measure '% do Desembolso' = DIVIDE ( [Desembolso Operacional], CALCULATE ( [Desembolso Operacional], REMOVEFILTERS ( Fato_Custos[CategoriaCusto] ) ) )
+		formatString: 0.0%
+		displayFolder: 03 Custos
+		lineageTag: 443f1998-7741-5167-8899-303abf7a67d1
+
+	measure '% Custo Variável' = DIVIDE ( CALCULATE ( [Desembolso Operacional], KEEPFILTERS ( Fato_Custos[TipoCusto] = "Variável" ) ), [Desembolso Operacional] )
+		formatString: 0.0%
+		displayFolder: 03 Custos
+		lineageTag: 7e872997-32ea-5680-8845-6a7a3dbd172f
+
+	/// Sacas por hectare necessárias para pagar o custo.
+	measure 'Break-even (sc/ha)' = DIVIDE ( [Custo por Hectare Grãos], [Preço Médio Grãos (R$/sc)] )
+		formatString: #,0.0
+		displayFolder: 03 Custos
+		lineageTag: efb440ec-3dab-544a-9374-910cb726f839
+
+	measure 'Margem de Segurança (sc/ha)' = IF ( NOT ISBLANK ( [Break-even (sc/ha)] ), [Produtividade Média (sc/ha)] - [Break-even (sc/ha)] )
+		formatString: #,0.0
+		displayFolder: 03 Custos
+		lineageTag: 1907fadf-c959-575b-b679-43a9159b44d6
+
+	measure 'Maior Categoria de Custo' =
+			VAR _top = TOPN ( 1, VALUES ( Fato_Custos[CategoriaCusto] ), [Desembolso Operacional], DESC )
+			RETURN MAXX ( _top, Fato_Custos[CategoriaCusto] )
+		displayFolder: 03 Custos
+		lineageTag: ac039273-077c-5ddc-b9ab-44a81ed10ee4
+
+	measure 'Fornecedor Principal' =
+			VAR _top = TOPN ( 1, FILTER ( VALUES ( Dim_Fornecedor[NomeFornecedor] ), NOT ISBLANK ( [Desembolso Operacional] ) ), [Desembolso Operacional], DESC )
+			RETURN MAXX ( _top, Dim_Fornecedor[NomeFornecedor] )
+		displayFolder: 03 Custos
+		lineageTag: ecec3f12-3b53-5167-a135-228070147975
+
+	measure 'Margem Bruta' =
+			VAR _r = [Receita Bruta]
+			VAR _c = [Custo de Produção]
+			RETURN IF ( ISBLANK ( _r ) && ISBLANK ( _c ), BLANK (), _r - _c )
+		formatString: \R$ #,0
+		displayFolder: 04 Rentabilidade
+		lineageTag: b40e0c17-b744-5c54-8f15-410ef3f1d4a7
+
+	measure 'Margem Bruta %' = DIVIDE ( [Margem Bruta], [Receita Bruta] )
+		formatString: 0.0%
+		displayFolder: 04 Rentabilidade
+		lineageTag: be6e0dea-ce25-5b50-b7a9-416979695c64
+
+	measure 'Margem por Hectare' = DIVIDE ( [Margem Bruta], [Área Plantada (ha)] )
+		formatString: \R$ #,0
+		displayFolder: 04 Rentabilidade
+		lineageTag: 0538894a-a266-5f05-9de7-3ec2fed82606
+
+	measure 'Ranking Fazenda (Receita)' = IF ( NOT ISBLANK ( [Receita Bruta] ), RANKX ( ALLSELECTED ( Dim_Fazenda[NomeFazenda] ), [Receita Bruta],, DESC, DENSE ) )
+		formatString: 0
+		displayFolder: 04 Rentabilidade
+		lineageTag: 36cd029c-c0df-5876-bafa-4abfc8ae511b
+
+	/// Ranking contra todas as fazendas, robusto ao filtro de tooltip (usado nos tooltips).
+	measure 'Ranking Fazenda (Portfólio)' =
+			VAR _atual = [Receita Bruta]
+			VAR _outras =
+			    ADDCOLUMNS (
+			        ALL ( Dim_Fazenda[NomeFazenda] ),
+			        "@r",
+			            VAR _f = Dim_Fazenda[NomeFazenda]
+			            RETURN CALCULATE ( [Receita Bruta], REMOVEFILTERS ( Dim_Fazenda ), Dim_Fazenda[NomeFazenda] = _f )
+			    )
+			RETURN IF ( NOT ISBLANK ( _atual ), COUNTROWS ( FILTER ( _outras, [@r] > _atual ) ) + 1 )
+		formatString: 0
+		displayFolder: 04 Rentabilidade
+		lineageTag: 2454f8eb-f0ff-510e-8c5a-2602dcc2c824
+
+	measure 'Ranking Fazenda (Margem %)' = IF ( NOT ISBLANK ( [Margem Bruta %] ), RANKX ( ALLSELECTED ( Dim_Fazenda[NomeFazenda] ), [Margem Bruta %],, DESC, DENSE ) )
+		formatString: 0
+		displayFolder: 04 Rentabilidade
+		lineageTag: 056a6bd0-b209-5276-9899-74db79d3f289
+
+	/// Último ano no filtro — base dos cards executivos.
+	measure 'Ano Referência' = MAX ( Dim_Tempo[Ano] )
+		formatString: 0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: e9743818-887d-560c-833d-2b57f269f61c
+
+	measure 'Data Limite Referência' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( MAX ( Dim_Tempo[Data] ), Dim_Tempo[Ano] = _ano )
+		formatString: dd/mm/yyyy
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: a67ae920-fc87-5993-af72-ec5285b1d627
+
+	measure 'Rótulo Período Referência' =
+			VAR _d = [Data Limite Referência]
+			RETURN
+			    FORMAT ( [Ano Referência], "0" )
+			        & IF ( _d < DATE ( YEAR ( _d ), 12, 31 ), " · até " & FORMAT ( _d, "dd/mmm" ), "" )
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 358a9a5a-b9f0-57e9-8e69-cb05eec5933d
+
+	measure 'Receita Bruta (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Receita Bruta], Dim_Tempo[Ano] = _ano )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: fcf3592a-5b10-5084-97df-1a1227342020
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Receita Bruta (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Receita Bruta], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: f415f6ea-d47d-5dbd-b6cf-38b04170f3e2
+
+	measure 'Receita Bruta YoY %' =
+			VAR _atual = [Receita Bruta (Ano Ref)]
+			VAR _anterior = [Receita Bruta (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 20038f3b-91cb-5ab7-92c1-e45c3ba9c7f3
+
+	measure 'Produção Grãos (sc) (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Produção Grãos (sc)], Dim_Tempo[Ano] = _ano )
+		formatString: #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 3b71ec46-1d96-59bf-b044-649fbac7fbfa
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Produção Grãos (sc) (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Produção Grãos (sc)], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 5e7caee1-2a87-54b7-83b5-d7acb7af5667
+
+	measure 'Produção Grãos (sc) YoY %' =
+			VAR _atual = [Produção Grãos (sc) (Ano Ref)]
+			VAR _anterior = [Produção Grãos (sc) (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: f2818718-c3b3-5d50-9933-3b3eaa4e7466
+
+	measure 'Produção Algodão (@) (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Produção Algodão (@)], Dim_Tempo[Ano] = _ano )
+		formatString: #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 79632113-4c3f-5577-a764-9ed5780f0cd4
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Produção Algodão (@) (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Produção Algodão (@)], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: bf5fa141-3ff1-5e99-ab92-eee286e7d806
+
+	measure 'Produção Algodão (@) YoY %' =
+			VAR _atual = [Produção Algodão (@) (Ano Ref)]
+			VAR _anterior = [Produção Algodão (@) (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: ae708aa1-bec9-58ac-87cc-0e2941148e85
+
+	measure 'Área Plantada (ha) (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Área Plantada (ha)], Dim_Tempo[Ano] = _ano )
+		formatString: #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 20603764-07d4-5267-ac90-26f2ea4f9a8e
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Área Plantada (ha) (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Área Plantada (ha)], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 379b6222-8055-5c93-9482-e6c413449f89
+
+	measure 'Área Plantada (ha) YoY %' =
+			VAR _atual = [Área Plantada (ha) (Ano Ref)]
+			VAR _anterior = [Área Plantada (ha) (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: dd9b3a08-5270-5d39-b228-482f5a8ed0b9
+
+	measure 'Produtividade Média (sc/ha) (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Produtividade Média (sc/ha)], Dim_Tempo[Ano] = _ano )
+		formatString: #,0.0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 6165fbe3-fbfd-5929-bee3-c2a699368b49
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Produtividade Média (sc/ha) (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Produtividade Média (sc/ha)], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: #,0.0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 07e7ba41-dd41-59cb-9acb-3efc3b4ae702
+
+	measure 'Produtividade Média (sc/ha) YoY %' =
+			VAR _atual = [Produtividade Média (sc/ha) (Ano Ref)]
+			VAR _anterior = [Produtividade Média (sc/ha) (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: a521e7b6-b270-52a9-9113-1f5e811e91d8
+
+	measure 'Custo de Produção (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Custo de Produção], Dim_Tempo[Ano] = _ano )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: db11a5c2-749f-550c-97b5-8da274abbf40
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Custo de Produção (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Custo de Produção], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: dd39f51e-5969-5765-a3cd-03e84a8a38fe
+
+	measure 'Custo de Produção YoY %' =
+			VAR _atual = [Custo de Produção (Ano Ref)]
+			VAR _anterior = [Custo de Produção (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 33b434a0-5d09-5bcf-9139-bf860668e421
+
+	measure 'Margem Bruta (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Margem Bruta], Dim_Tempo[Ano] = _ano )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: a420a046-4844-5104-ab3d-fabd599e6dda
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Margem Bruta (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Margem Bruta], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 25563d6b-b7a6-516e-8ef9-9db4e52a4362
+
+	measure 'Margem Bruta YoY %' =
+			VAR _atual = [Margem Bruta (Ano Ref)]
+			VAR _anterior = [Margem Bruta (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 19efb01b-9906-5037-8583-c609836ab4d0
+
+	measure 'Custo por Hectare (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Custo por Hectare], Dim_Tempo[Ano] = _ano )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: cfae786a-27b3-52a0-b69f-d0425214a568
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Custo por Hectare (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Custo por Hectare], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 9e13a4b3-453e-5284-84c3-359686c2647d
+
+	measure 'Custo por Hectare YoY %' =
+			VAR _atual = [Custo por Hectare (Ano Ref)]
+			VAR _anterior = [Custo por Hectare (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: ad345c78-a12e-5cb7-8886-46773dff3631
+
+	measure 'Desembolso Operacional (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Desembolso Operacional], Dim_Tempo[Ano] = _ano )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 9c049124-aa50-5a3e-adb1-0dc08b429b54
+
+	/// Mesmo período do ano anterior (YTD comparável).
+	measure 'Desembolso Operacional (Ano Ant)' =
+			VAR _ano = [Ano Referência]
+			VAR _limite = EDATE ( [Data Limite Referência], -12 )
+			RETURN CALCULATE ( [Desembolso Operacional], Dim_Tempo[Ano] = _ano - 1, Dim_Tempo[Data] <= _limite )
+		formatString: \R$ #,0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: ef3ca76a-2075-54a1-86bc-8a1d1b6a67e7
+
+	measure 'Desembolso Operacional YoY %' =
+			VAR _atual = [Desembolso Operacional (Ano Ref)]
+			VAR _anterior = [Desembolso Operacional (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _atual ) && NOT ISBLANK ( _anterior ), DIVIDE ( _atual - _anterior, _anterior ) )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: fe23f47a-af16-5563-a4ec-e1f5094820dc
+
+	measure 'Break-even (sc/ha) (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Break-even (sc/ha)], Dim_Tempo[Ano] = _ano )
+		formatString: #,0.0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: d75dd748-d255-5559-a108-469e04a7b780
+
+	measure 'Preço Médio Grãos (R$/sc) (Ano Ref)' =
+			VAR _ano = [Ano Referência]
+			RETURN CALCULATE ( [Preço Médio Grãos (R$/sc)], Dim_Tempo[Ano] = _ano )
+		formatString: \R$ #,0.00
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 94c22a28-2c95-5052-971c-ebc68f890d28
+
+	measure 'Margem Bruta % (Ano Ref)' = DIVIDE ( [Margem Bruta (Ano Ref)], [Receita Bruta (Ano Ref)] )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: ed670ed0-3e0c-5367-8d34-da416db4ebaf
+
+	measure 'Margem Bruta % (Ano Ant)' = DIVIDE ( [Margem Bruta (Ano Ant)], [Receita Bruta (Ano Ant)] )
+		formatString: 0.0%
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: 4aa44285-be82-54d4-885e-1bfc5bac999b
+
+	/// Variação em pontos percentuais.
+	measure 'Margem Bruta % Δ p.p.' =
+			VAR _a = [Margem Bruta % (Ano Ref)]
+			VAR _b = [Margem Bruta % (Ano Ant)]
+			RETURN IF ( NOT ISBLANK ( _a ) && NOT ISBLANK ( _b ), ( _a - _b ) * 100 )
+		formatString: +0.0;-0.0;0.0
+		displayFolder: 05 Inteligência de Tempo
+		lineageTag: f88b8fbb-9c6c-5191-b9e7-c9c0f9c36041
+
+	/// Precipitação média por mês. TREATAS faz o filtro de Fazenda chegar ao clima da região.
+	measure 'Chuva Média Mensal (mm)' = CALCULATE ( AVERAGE ( Fato_Clima[PrecipitacaoMm] ), TREATAS ( VALUES ( Dim_Fazenda[RegiaoKey] ), Dim_Regiao[RegiaoKey] ) )
+		formatString: #,0.0
+		displayFolder: 06 Clima
+		lineageTag: 07d17b5c-a449-5666-b5b5-8d29f71f4bc6
+
+	/// Soma do período por região (média entre regiões).
+	measure 'Precipitação Acumulada (mm)' =
+			CALCULATE (
+			    AVERAGEX ( VALUES ( Dim_Regiao[RegiaoKey] ), CALCULATE ( SUM ( Fato_Clima[PrecipitacaoMm] ) ) ),
+			    TREATAS ( VALUES ( Dim_Fazenda[RegiaoKey] ), Dim_Regiao[RegiaoKey] )
+			)
+		formatString: #,0
+		displayFolder: 06 Clima
+		lineageTag: 106acd88-d18e-5741-a354-4ee28e8c2e16
+
+	measure 'Temperatura Média (°C)' = CALCULATE ( AVERAGE ( Fato_Clima[TempMediaC] ), TREATAS ( VALUES ( Dim_Fazenda[RegiaoKey] ), Dim_Regiao[RegiaoKey] ) )
+		formatString: #,0.0
+		displayFolder: 06 Clima
+		lineageTag: 390d6c80-52c1-5f3f-981f-d9c8fe387fe4
+
+	measure 'Umidade Relativa Média' = CALCULATE ( AVERAGE ( Fato_Clima[UmidadeRelativa] ), TREATAS ( VALUES ( Dim_Fazenda[RegiaoKey] ), Dim_Regiao[RegiaoKey] ) )
+		formatString: 0"%"
+		displayFolder: 06 Clima
+		lineageTag: fbca7b6b-aebc-5855-9c2c-f921fbdbd7e8
+
+	measure 'Dias de Chuva (média/mês)' = CALCULATE ( AVERAGE ( Fato_Clima[DiasChuva] ), TREATAS ( VALUES ( Dim_Fazenda[RegiaoKey] ), Dim_Regiao[RegiaoKey] ) )
+		formatString: #,0.0
+		displayFolder: 06 Clima
+		lineageTag: 8c7663bb-5d13-5796-8817-605f8868bc86
+
+	/// Pearson entre chuva média e produtividade (pontos UF × Safra).
+	measure 'Correlação Chuva x Produtividade (r)' =
+			VAR _pontos =
+			    FILTER (
+			        ADDCOLUMNS (
+			            CROSSJOIN ( VALUES ( Dim_Regiao[UF] ), VALUES ( Dim_Tempo[Safra] ) ),
+			            "@x", [Chuva Média Mensal (mm)],
+			            "@y", [Produtividade Média (sc/ha)]
+			        ),
+			        NOT ISBLANK ( [@x] ) && NOT ISBLANK ( [@y] )
+			    )
+			VAR _n = COUNTROWS ( _pontos )
+			VAR _mx = AVERAGEX ( _pontos, [@x] )
+			VAR _my = AVERAGEX ( _pontos, [@y] )
+			VAR _cov = SUMX ( _pontos, ( [@x] - _mx ) * ( [@y] - _my ) )
+			VAR _sx = SQRT ( SUMX ( _pontos, ( [@x] - _mx ) ^ 2 ) )
+			VAR _sy = SQRT ( SUMX ( _pontos, ( [@y] - _my ) ^ 2 ) )
+			RETURN IF ( _n >= 3, DIVIDE ( _cov, _sx * _sy ) )
+		formatString: 0.00
+		displayFolder: 06 Clima
+		lineageTag: 75d96736-9432-5aa5-8dc5-6ab8a12056ef
+
+	measure 'Leitura da Correlação' =
+			VAR _r = [Correlação Chuva x Produtividade (r)]
+			VAR _abs = ABS ( _r )
+			RETURN
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _r ), "Amostra insuficiente",
+			        _abs < 0.3, "Relação fraca: manejo e mix de culturas pesam mais que a chuva",
+			        _abs < 0.6, IF ( _r > 0, "Relação moderada positiva", "Relação moderada negativa" ),
+			        IF ( _r > 0, "Relação forte positiva", "Relação forte negativa" )
+			    )
+		displayFolder: 06 Clima
+		lineageTag: 5d314ec6-d887-5dde-a46a-0de3d3d42491
+
+	measure 'Filtros Ativos (qtd)' =
+			INT ( ISFILTERED ( Dim_Tempo[Ano] ) ) + INT ( ISFILTERED ( Dim_Tempo[Safra] ) )
+			    + INT ( ISFILTERED ( Dim_Cultura[Cultura] ) ) + INT ( ISFILTERED ( Dim_Regiao[UF] ) )
+			    + INT ( ISFILTERED ( Dim_Fazenda[NomeFazenda] ) ) + INT ( ISFILTERED ( Dim_Fazenda[TipoPropriedade] ) )
+			    + INT ( ISFILTERED ( Dim_Cliente[Canal] ) ) + INT ( ISFILTERED ( Fato_Vendas[TipoContrato] ) )
+		formatString: 0
+		displayFolder: 07 Navegação & Contexto
+		lineageTag: f9828c9d-f402-5b19-afb8-bfc351e3df97
+
+	measure 'Texto Filtros Ativos' =
+			VAR _n = [Filtros Ativos (qtd)]
+			RETURN IF ( _n = 0, "Visão consolidada · sem filtros", _n & IF ( _n = 1, " filtro ativo", " filtros ativos" ) )
+		displayFolder: 07 Navegação & Contexto
+		lineageTag: fed179a2-37a2-5171-b553-31ad80b62ff7
+
+	/// Cabeçalho com marca, navegação, contexto e botão Filtros.
+	measure 'HTML Header Executiva' =
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .hd{position:absolute;inset:0;border-radius:16px;overflow:hidden;background:linear-gradient(100deg,#0E2A12 0%,#1B5E20 52%,#2E7D32 100%);box-shadow:0 10px 26px rgba(14,42,18,.28);animation:fd .8s cubic-bezier(.2,.7,.2,1) both} .hd:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#C9A227,#F3D77A,#C9A227,transparent);background-size:200% 100%;animation:sh 6s linear infinite} @keyframes fd{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}} .br{position:absolute;left:1.0%;width:21.0%;top:0;bottom:0;display:flex;align-items:center;gap:10px} .lg{width:40px;height:40px;flex:none;background:rgba(255,255,255,.96);border-radius:50%;padding:3px;box-shadow:0 0 0 2px rgba(201,162,39,.55)} .bn{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-weight:800;color:#fff;font-size:16px;letter-spacing:.01em;line-height:1} .bn span{color:#C9A227;font-size:11px;margin-left:3px;letter-spacing:.2em} .bs{font-size:9px;letter-spacing:.24em;color:#BFD8BA;margin-top:5px;font-weight:600} .tt{position:absolute;left:23%;width:6.5%;top:0;bottom:0} .pl{position:absolute;top:22.0%;height:56.0%;border-radius:40px;display:flex;align-items:center;justify-content:center;color:#E6F0E3;font-size:12px;font-weight:600;letter-spacing:.02em;border:1px solid rgba(255,255,255,.18);transition:all .3s} .pl.on{background:#fff;color:#1B5E20;border-color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.25)} .pl.on:before{content:'';width:6px;height:6px;border-radius:50%;background:#C9A227;margin-right:8px;box-shadow:0 0 0 3px rgba(201,162,39,.25)} .cx{position:absolute;left:75.0%;width:14.5%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;border-left:1px solid rgba(255,255,255,.18);padding-left:12px} .cx b{color:#fff;font-size:11.5px;font-weight:700}.cx i{font-style:normal;color:#BFD8BA;font-size:9.5px;margin-top:3px} .fl{position:absolute;left:90.5%;width:8.5%;top:22.0%;height:56.0%;border-radius:40px;background:linear-gradient(135deg,#E3C25B,#C9A227);color:#1B3A12;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(201,162,39,.4)} .fl em{font-style:normal;background:#1B5E20;color:#fff;border-radius:10px;font-size:9.5px;padding:1px 6px} .pg{position:absolute;right:0;top:0}</style><div class='hd'> <div class='br'><div class='lg'><svg viewBox='0 0 64 64' width='100%' height='100%'> <path d='M32 4 A28 28 0 0 0 6.5 44' fill='none' stroke='#43A047' stroke-width='3.2' stroke-linecap='round'/> <path d='M32 4 A28 28 0 0 1 57.5 44' fill='none' stroke='#C9A227' stroke-width='3.2' stroke-linecap='round'/> <path d='M13 45 C11 29 21 17 35 13 C37 29 29 42 13 45 Z' fill='#2E7D32'/> <path d='M14.5 43.5 C20 35 26 26 33 16' fill='none' stroke='#A5D6A7' stroke-width='1.3'/> <path d='M40 52 C40.5 40 42.5 29 47 16' fill='none' stroke='#C9A227' stroke-width='2'/> <g fill='#E0B83A'><ellipse cx='47.5' cy='17' rx='2.4' ry='4.6' transform='rotate(20 47.5 17)'/> <ellipse cx='43' cy='24' rx='2.3' ry='4.4' transform='rotate(-35 43 24)'/><ellipse cx='49' cy='27' rx='2.3' ry='4.4' transform='rotate(40 49 27)'/> <ellipse cx='41.5' cy='32' rx='2.3' ry='4.4' transform='rotate(-35 41.5 32)'/><ellipse cx='47.5' cy='35' rx='2.3' ry='4.4' transform='rotate(40 47.5 35)'/></g> <path d='M8 50 Q32 41 56 50' fill='none' stroke='#1B5E20' stroke-width='3'/><path d='M12 56 Q32 48 52 56' fill='none' stroke='#2E7D32' stroke-width='2.4'/> </svg></div><div><div class='bn'>AgroCerrado<span>S.A.</span></div><div class='bs'>INTELIGÊNCIA DE SAFRA</div></div></div> <div class='pl on' style='left:30.0%;width:13.0%'><span>Visão Executiva</span></div><div class='pl' style='left:44.0%;width:15.5%'><span>Produção & Comercial</span></div><div class='pl' style='left:60.5%;width:13.0%'><span>Custos & Clima</span></div> <div class='cx'><b>Ref. "
+			& ( [Rótulo Período Referência] )
+			& "</b><i>"
+			& ( [Texto Filtros Ativos] )
+			& "</i></div> <div class='fl'><svg viewBox='0 0 24 24' width='14' height='14'><path d='M3 5h18l-7 8v6l-4-2v-4z' fill='#1B3A12'/></svg>Filtros"
+			& ( IF ( [Filtros Ativos (qtd)] > 0, "<em>" & [Filtros Ativos (qtd)] & "</em>", "" ) )
+			& "</div> </div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: 10e9e123-d0e0-5278-b352-c92b579c5181
+
+	measure 'HTML Header Producao' =
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .hd{position:absolute;inset:0;border-radius:16px;overflow:hidden;background:linear-gradient(100deg,#0E2A12 0%,#1B5E20 52%,#2E7D32 100%);box-shadow:0 10px 26px rgba(14,42,18,.28);animation:fd .8s cubic-bezier(.2,.7,.2,1) both} .hd:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#C9A227,#F3D77A,#C9A227,transparent);background-size:200% 100%;animation:sh 6s linear infinite} @keyframes fd{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}} .br{position:absolute;left:1.0%;width:21.0%;top:0;bottom:0;display:flex;align-items:center;gap:10px} .lg{width:40px;height:40px;flex:none;background:rgba(255,255,255,.96);border-radius:50%;padding:3px;box-shadow:0 0 0 2px rgba(201,162,39,.55)} .bn{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-weight:800;color:#fff;font-size:16px;letter-spacing:.01em;line-height:1} .bn span{color:#C9A227;font-size:11px;margin-left:3px;letter-spacing:.2em} .bs{font-size:9px;letter-spacing:.24em;color:#BFD8BA;margin-top:5px;font-weight:600} .tt{position:absolute;left:23%;width:6.5%;top:0;bottom:0} .pl{position:absolute;top:22.0%;height:56.0%;border-radius:40px;display:flex;align-items:center;justify-content:center;color:#E6F0E3;font-size:12px;font-weight:600;letter-spacing:.02em;border:1px solid rgba(255,255,255,.18);transition:all .3s} .pl.on{background:#fff;color:#1B5E20;border-color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.25)} .pl.on:before{content:'';width:6px;height:6px;border-radius:50%;background:#C9A227;margin-right:8px;box-shadow:0 0 0 3px rgba(201,162,39,.25)} .cx{position:absolute;left:75.0%;width:14.5%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;border-left:1px solid rgba(255,255,255,.18);padding-left:12px} .cx b{color:#fff;font-size:11.5px;font-weight:700}.cx i{font-style:normal;color:#BFD8BA;font-size:9.5px;margin-top:3px} .fl{position:absolute;left:90.5%;width:8.5%;top:22.0%;height:56.0%;border-radius:40px;background:linear-gradient(135deg,#E3C25B,#C9A227);color:#1B3A12;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(201,162,39,.4)} .fl em{font-style:normal;background:#1B5E20;color:#fff;border-radius:10px;font-size:9.5px;padding:1px 6px} .pg{position:absolute;right:0;top:0}</style><div class='hd'> <div class='br'><div class='lg'><svg viewBox='0 0 64 64' width='100%' height='100%'> <path d='M32 4 A28 28 0 0 0 6.5 44' fill='none' stroke='#43A047' stroke-width='3.2' stroke-linecap='round'/> <path d='M32 4 A28 28 0 0 1 57.5 44' fill='none' stroke='#C9A227' stroke-width='3.2' stroke-linecap='round'/> <path d='M13 45 C11 29 21 17 35 13 C37 29 29 42 13 45 Z' fill='#2E7D32'/> <path d='M14.5 43.5 C20 35 26 26 33 16' fill='none' stroke='#A5D6A7' stroke-width='1.3'/> <path d='M40 52 C40.5 40 42.5 29 47 16' fill='none' stroke='#C9A227' stroke-width='2'/> <g fill='#E0B83A'><ellipse cx='47.5' cy='17' rx='2.4' ry='4.6' transform='rotate(20 47.5 17)'/> <ellipse cx='43' cy='24' rx='2.3' ry='4.4' transform='rotate(-35 43 24)'/><ellipse cx='49' cy='27' rx='2.3' ry='4.4' transform='rotate(40 49 27)'/> <ellipse cx='41.5' cy='32' rx='2.3' ry='4.4' transform='rotate(-35 41.5 32)'/><ellipse cx='47.5' cy='35' rx='2.3' ry='4.4' transform='rotate(40 47.5 35)'/></g> <path d='M8 50 Q32 41 56 50' fill='none' stroke='#1B5E20' stroke-width='3'/><path d='M12 56 Q32 48 52 56' fill='none' stroke='#2E7D32' stroke-width='2.4'/> </svg></div><div><div class='bn'>AgroCerrado<span>S.A.</span></div><div class='bs'>INTELIGÊNCIA DE SAFRA</div></div></div> <div class='pl' style='left:30.0%;width:13.0%'><span>Visão Executiva</span></div><div class='pl on' style='left:44.0%;width:15.5%'><span>Produção & Comercial</span></div><div class='pl' style='left:60.5%;width:13.0%'><span>Custos & Clima</span></div> <div class='cx'><b>Ref. "
+			& ( [Rótulo Período Referência] )
+			& "</b><i>"
+			& ( [Texto Filtros Ativos] )
+			& "</i></div> <div class='fl'><svg viewBox='0 0 24 24' width='14' height='14'><path d='M3 5h18l-7 8v6l-4-2v-4z' fill='#1B3A12'/></svg>Filtros"
+			& ( IF ( [Filtros Ativos (qtd)] > 0, "<em>" & [Filtros Ativos (qtd)] & "</em>", "" ) )
+			& "</div> </div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: 1fe54a3c-f9d5-57af-8841-fbdd33a5ea77
+
+	measure 'HTML Header Custos' =
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .hd{position:absolute;inset:0;border-radius:16px;overflow:hidden;background:linear-gradient(100deg,#0E2A12 0%,#1B5E20 52%,#2E7D32 100%);box-shadow:0 10px 26px rgba(14,42,18,.28);animation:fd .8s cubic-bezier(.2,.7,.2,1) both} .hd:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#C9A227,#F3D77A,#C9A227,transparent);background-size:200% 100%;animation:sh 6s linear infinite} @keyframes fd{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}} .br{position:absolute;left:1.0%;width:21.0%;top:0;bottom:0;display:flex;align-items:center;gap:10px} .lg{width:40px;height:40px;flex:none;background:rgba(255,255,255,.96);border-radius:50%;padding:3px;box-shadow:0 0 0 2px rgba(201,162,39,.55)} .bn{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-weight:800;color:#fff;font-size:16px;letter-spacing:.01em;line-height:1} .bn span{color:#C9A227;font-size:11px;margin-left:3px;letter-spacing:.2em} .bs{font-size:9px;letter-spacing:.24em;color:#BFD8BA;margin-top:5px;font-weight:600} .tt{position:absolute;left:23%;width:6.5%;top:0;bottom:0} .pl{position:absolute;top:22.0%;height:56.0%;border-radius:40px;display:flex;align-items:center;justify-content:center;color:#E6F0E3;font-size:12px;font-weight:600;letter-spacing:.02em;border:1px solid rgba(255,255,255,.18);transition:all .3s} .pl.on{background:#fff;color:#1B5E20;border-color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.25)} .pl.on:before{content:'';width:6px;height:6px;border-radius:50%;background:#C9A227;margin-right:8px;box-shadow:0 0 0 3px rgba(201,162,39,.25)} .cx{position:absolute;left:75.0%;width:14.5%;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;border-left:1px solid rgba(255,255,255,.18);padding-left:12px} .cx b{color:#fff;font-size:11.5px;font-weight:700}.cx i{font-style:normal;color:#BFD8BA;font-size:9.5px;margin-top:3px} .fl{position:absolute;left:90.5%;width:8.5%;top:22.0%;height:56.0%;border-radius:40px;background:linear-gradient(135deg,#E3C25B,#C9A227);color:#1B3A12;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:12px;box-shadow:0 4px 14px rgba(201,162,39,.4)} .fl em{font-style:normal;background:#1B5E20;color:#fff;border-radius:10px;font-size:9.5px;padding:1px 6px} .pg{position:absolute;right:0;top:0}</style><div class='hd'> <div class='br'><div class='lg'><svg viewBox='0 0 64 64' width='100%' height='100%'> <path d='M32 4 A28 28 0 0 0 6.5 44' fill='none' stroke='#43A047' stroke-width='3.2' stroke-linecap='round'/> <path d='M32 4 A28 28 0 0 1 57.5 44' fill='none' stroke='#C9A227' stroke-width='3.2' stroke-linecap='round'/> <path d='M13 45 C11 29 21 17 35 13 C37 29 29 42 13 45 Z' fill='#2E7D32'/> <path d='M14.5 43.5 C20 35 26 26 33 16' fill='none' stroke='#A5D6A7' stroke-width='1.3'/> <path d='M40 52 C40.5 40 42.5 29 47 16' fill='none' stroke='#C9A227' stroke-width='2'/> <g fill='#E0B83A'><ellipse cx='47.5' cy='17' rx='2.4' ry='4.6' transform='rotate(20 47.5 17)'/> <ellipse cx='43' cy='24' rx='2.3' ry='4.4' transform='rotate(-35 43 24)'/><ellipse cx='49' cy='27' rx='2.3' ry='4.4' transform='rotate(40 49 27)'/> <ellipse cx='41.5' cy='32' rx='2.3' ry='4.4' transform='rotate(-35 41.5 32)'/><ellipse cx='47.5' cy='35' rx='2.3' ry='4.4' transform='rotate(40 47.5 35)'/></g> <path d='M8 50 Q32 41 56 50' fill='none' stroke='#1B5E20' stroke-width='3'/><path d='M12 56 Q32 48 52 56' fill='none' stroke='#2E7D32' stroke-width='2.4'/> </svg></div><div><div class='bn'>AgroCerrado<span>S.A.</span></div><div class='bs'>INTELIGÊNCIA DE SAFRA</div></div></div> <div class='pl' style='left:30.0%;width:13.0%'><span>Visão Executiva</span></div><div class='pl' style='left:44.0%;width:15.5%'><span>Produção & Comercial</span></div><div class='pl on' style='left:60.5%;width:13.0%'><span>Custos & Clima</span></div> <div class='cx'><b>Ref. "
+			& ( [Rótulo Período Referência] )
+			& "</b><i>"
+			& ( [Texto Filtros Ativos] )
+			& "</i></div> <div class='fl'><svg viewBox='0 0 24 24' width='14' height='14'><path d='M3 5h18l-7 8v6l-4-2v-4z' fill='#1B3A12'/></svg>Filtros"
+			& ( IF ( [Filtros Ativos (qtd)] > 0, "<em>" & [Filtros Ativos (qtd)] & "</em>", "" ) )
+			& "</div> </div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: e55f4b1e-86b0-579a-9312-4597eb92c81d
+
+	/// Cinco cards animados com YoY, sparkline, mix e detalhe no hover.
+	measure 'HTML KPIs Executivo' =
+			VAR _ano = [Ano Referência]
+			VAR _aa = FORMAT ( _ano - 1, "0" )
+			VAR _rec = [Receita Bruta (Ano Ref)]
+			VAR _recY = [Receita Bruta YoY %]
+			VAR _prd = [Produção Grãos (sc) (Ano Ref)]
+			VAR _prdY = [Produção Grãos (sc) YoY %]
+			VAR _alg = [Produção Algodão (@) (Ano Ref)]
+			VAR _mg = [Margem Bruta % (Ano Ref)]
+			VAR _mgD = [Margem Bruta % Δ p.p.]
+			VAR _mgR = [Margem Bruta (Ano Ref)]
+			VAR _ar = [Área Plantada (ha) (Ano Ref)]
+			VAR _arY = [Área Plantada (ha) YoY %]
+			VAR _int = [Intensidade de Uso da Terra]
+			VAR _pt = [Produtividade Média (sc/ha) (Ano Ref)]
+			VAR _ptY = [Produtividade Média (sc/ha) YoY %]
+			VAR _be = [Break-even (sc/ha) (Ano Ref)]
+			VAR _serie =
+			    ADDCOLUMNS (
+			        CALCULATETABLE ( VALUES ( Dim_Tempo[Mes] ), Dim_Tempo[Ano] = _ano ),
+			        "@v", COALESCE ( CALCULATE ( [Receita Bruta], Dim_Tempo[Ano] = _ano ), 0 )
+			    )
+			VAR _max = MAXX ( _serie, [@v] )
+			VAR _pts =
+			    CONCATENATEX (
+			        _serie,
+			        FORMAT ( ( Dim_Tempo[Mes] - 1 ) / 11 * 100, "0.0", "en-US" ) & ","
+			            & FORMAT ( 19 - DIVIDE ( [@v], _max ) * 17, "0.0", "en-US" ),
+			        " ", Dim_Tempo[Mes], ASC
+			    )
+			VAR _totG = [Produção Grãos (sc) (Ano Ref)]
+			VAR _mix =
+			    FILTER (
+			        ADDCOLUMNS ( VALUES ( Dim_Cultura[Cultura] ), "@v", [Produção Grãos (sc) (Ano Ref)] ),
+			        [@v] > 0
+			    )
+			VAR _cor = "Soja:#1B5E20|Milho:#C9A227|Sorgo:#8D6E63|Milheto:#66BB6A"
+			VAR _barras =
+			    CONCATENATEX (
+			        _mix,
+			        "<span style='width:" & FORMAT ( DIVIDE ( [@v], _totG ) * 100, "0.0", "en-US" ) & "%;background:"
+			            & SWITCH ( Dim_Cultura[Cultura], "Soja", "#1B5E20", "Milho", "#C9A227", "Sorgo", "#8D6E63", "#66BB6A" ) & "'></span>",
+			        "", [@v], DESC
+			    )
+			VAR _leg =
+			    CONCATENATEX (
+			        _mix,
+			        "<span><i style='background:" & SWITCH ( Dim_Cultura[Cultura], "Soja", "#1B5E20", "Milho", "#C9A227", "Sorgo", "#8D6E63", "#66BB6A" )
+			            & "'></i>" & Dim_Cultura[Cultura] & " " & FORMAT ( DIVIDE ( [@v], _totG ), "0%" ) & "</span>",
+			        "", [@v], DESC
+			    )
+			RETURN
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .wr{position:absolute;inset:4px 2px 2px 2px;display:flex;gap:12px} .cd{position:relative;flex:1;min-width:0;background:rgba(255,255,255,.96);border:1px solid #E8E2CF;border-radius:16px;padding:12px 14px 10px 18px;overflow:hidden;box-shadow:0 6px 18px rgba(14,42,18,.08);animation:fu .7s cubic-bezier(.2,.7,.2,1) both;transition:transform .35s,box-shadow .35s,border-color .35s} .cd:before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#C9A227,#1B5E20)} .cd:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(14,42,18,.18);border-color:#C9A227} .cd:nth-child(2){animation-delay:.08s}.cd:nth-child(3){animation-delay:.16s}.cd:nth-child(4){animation-delay:.24s}.cd:nth-child(5){animation-delay:.32s}.cd:nth-child(6){animation-delay:.40s} .lb{font-size:9.5px;letter-spacing:.13em;color:#5F6B5F;font-weight:700;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .vl{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:25px;font-weight:800;color:#1B5E20;line-height:1.15;margin-top:5px;white-space:nowrap} .vl small{font-size:12px;font-weight:700;color:#2E7D32;margin-left:2px} .rw{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:9.5px;color:#6B756B;white-space:nowrap} .d{font-weight:700;padding:2px 7px;border-radius:20px;font-size:9.5px} .up{background:#E6F2E4;color:#1B5E20}.dn{background:#FBE9E5;color:#B23B2E}.nt{background:#F1EEE4;color:#7A6A3A} .vz{position:absolute;left:18px;right:14px;bottom:10px;height:20px} .br{height:7px;border-radius:7px;background:#EEF3EC;overflow:hidden;display:flex;margin-top:7px} .br span{display:block;height:100%;animation:gw 1.3s cubic-bezier(.2,.7,.2,1) .3s both} .lgd{display:flex;gap:8px;font-size:8.5px;color:#6B756B;margin-top:3px;white-space:nowrap} .lgd i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px} .sp polyline{stroke-dasharray:100;animation:dr 1.8s ease-out .35s both} .dt{position:absolute;inset:0;background:linear-gradient(135deg,#1B5E20,#0E2A12);color:#fff;padding:12px 14px 10px 18px;opacity:0;transform:translateY(10px);transition:all .35s;font-size:10.5px;line-height:1.55} .cd:hover .dt{opacity:1;transform:none} .dt .k{font-size:9px;letter-spacing:.14em;color:#C9A227;font-weight:800;margin-bottom:3px} .dt b{color:#F0D27A;font-weight:700} .mk{position:relative}.mk u{position:absolute;top:-3px;width:2px;height:13px;background:#B23B2E;border-radius:2px}</style><div class='wr'> <div class='cd'><div class='lb'>Receita bruta</div> <div class='vl'>"
+			& ( "R$ " & FORMAT ( DIVIDE ( _rec, 1000000 ), "#,0.0" ) & " mi" )
+			& "</div> <div class='rw'>"
+			& ( IF ( ISBLANK ( _recY ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( _recY >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( _recY ), "0.0%" ) & "</span>" ) )
+			& "<span>vs "
+			& ( _aa )
+			& " mesmo período</span></div> <div class='vz'><svg class='sp' viewBox='0 0 100 20' preserveAspectRatio='none' width='100%' height='20'> <defs><linearGradient id='ga' x1='0' x2='0' y1='0' y2='1'><stop offset='0' stop-color='#C9A227' stop-opacity='.35'/><stop offset='1' stop-color='#C9A227' stop-opacity='0'/></linearGradient></defs> <polygon points='0,20 "
+			& ( _pts )
+			& " 100,20' fill='url(#ga)'/> <polyline points='"
+			& ( _pts )
+			& "' pathLength='100' fill='none' stroke='#C9A227' stroke-width='2' vector-effect='non-scaling-stroke' stroke-linejoin='round'/></svg></div> <div class='dt'><div class='k'>RECEITA · DETALHE</div>Período filtrado: <b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Receita Bruta], 1000000 ), "#,0.0" ) & " mi" )
+			& "</b><br>Contratos: <b>"
+			& ( FORMAT([Nº Contratos],"#,0") )
+			& "</b> · Ticket: <b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Ticket Médio por Contrato], 1000000 ), "#,0.00" ) & " mi" )
+			& "</b><br>Exportação: <b>"
+			& ( FORMAT([% Exportação],"0%") )
+			& "</b> da receita</div></div> <div class='cd'><div class='lb'>Produção de grãos</div> <div class='vl'>"
+			& ( FORMAT(DIVIDE(_prd,1000000),"#,0.00") )
+			& "<small>mi sc</small></div> <div class='rw'>"
+			& ( IF ( ISBLANK ( _prdY ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( _prdY >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( _prdY ), "0.0%" ) & "</span>" ) )
+			& "<span>+ "
+			& ( FORMAT(DIVIDE(_alg,1000),"#,0") )
+			& " mil @ algodão</span></div> <div class='vz'><div class='br'>"
+			& ( _barras )
+			& "</div><div class='lgd'>"
+			& ( _leg )
+			& "</div></div> <div class='dt'><div class='k'>PRODUÇÃO · DETALHE</div>Algodão: <b>"
+			& ( FORMAT(_alg,"#,0") )
+			& " @</b> ("
+			& ( IF ( ISBLANK ( [Produção Algodão (@) YoY %] ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( [Produção Algodão (@) YoY %] >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( [Produção Algodão (@) YoY %] ), "0.0%" ) & "</span>" ) )
+			& ")<br>Volume vendido no período: <b>"
+			& ( FORMAT(DIVIDE([Volume Vendido],1000000),"#,0.00") )
+			& " mi</b><br>Unidades separadas: sc 60 kg × arroba</div></div> <div class='cd'><div class='lb'>Margem bruta</div> <div class='vl'>"
+			& ( FORMAT(_mg,"0.0%") )
+			& "</div> <div class='rw'>"
+			& ( IF ( ISBLANK ( _mgD ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( _mgD >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( _mgD ), "0.0" ) & " p.p." & "</span>" ) )
+			& "<span>vs "
+			& ( _aa )
+			& "</span></div> <div class='vz'><div class='br'><span style='width:"
+			& ( FORMAT(MIN(MAX(_mg,0),1)*100,"0.0","en-US") )
+			& "%;background:linear-gradient(90deg,#2E7D32,#C9A227)'></span></div><div class='lgd'><span>"
+			& ( "R$ " & FORMAT ( DIVIDE ( _mgR, 1000000 ), "#,0.0" ) & " mi" )
+			& " de margem no ano</span></div></div> <div class='dt'><div class='k'>MARGEM · DETALHE</div>Receita: <b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( _rec, 1000000 ), "#,0.0" ) & " mi" )
+			& "</b><br>Custo de produção: <b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Custo de Produção (Ano Ref)], 1000000 ), "#,0.0" ) & " mi" )
+			& "</b><br>Margem/ha: <b>R$ "
+			& ( FORMAT(DIVIDE(_mgR,_ar),"#,0") )
+			& "</b></div></div> <div class='cd'><div class='lb'>Área plantada</div> <div class='vl'>"
+			& ( FORMAT(DIVIDE(_ar,1000),"#,0.0") )
+			& "<small>mil ha</small></div> <div class='rw'>"
+			& ( IF ( ISBLANK ( _arY ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( _arY >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( _arY ), "0.0%" ) & "</span>" ) )
+			& "<span>intensidade "
+			& ( FORMAT(_int,"0.00") )
+			& "x</span></div> <div class='vz'><div class='br'><span style='width:"
+			& ( FORMAT(MIN(DIVIDE(_ar,_ar+[Área Total Fazendas (ha)]),1)*100,"0.0","en-US") )
+			& "%;background:#2E7D32'></span><span style='width:"
+			& ( FORMAT(MIN(DIVIDE([Área Total Fazendas (ha)],_ar+[Área Total Fazendas (ha)]),1)*100,"0.0","en-US") )
+			& "%;background:#E3D7A8'></span></div><div class='lgd'><span><i style='background:#2E7D32'></i>plantada</span><span><i style='background:#E3D7A8'></i>área física "
+			& ( FORMAT(DIVIDE([Área Total Fazendas (ha)],1000),"#,0.0") )
+			& " mil ha</span></div></div> <div class='dt'><div class='k'>ÁREA · DETALHE</div>Verão: <b>"
+			& ( FORMAT(DIVIDE([Área Verão (ha)],1000),"#,0.0") )
+			& " mil ha</b> · Safrinha: <b>"
+			& ( FORMAT(DIVIDE([Área Safrinha (ha)],1000),"#,0.0") )
+			& " mil ha</b><br>(período filtrado)<br>Intensidade >1x = 2ª safra no mesmo solo</div></div> <div class='cd'><div class='lb'>Produtividade média</div> <div class='vl'>"
+			& ( FORMAT(_pt,"#,0.0") )
+			& "<small>sc/ha</small></div> <div class='rw'>"
+			& ( IF ( ISBLANK ( _ptY ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( _ptY >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( _ptY ), "0.0%" ) & "</span>" ) )
+			& "<span>break-even "
+			& ( FORMAT(_be,"#,0.0") )
+			& " sc/ha</span></div> <div class='vz'><div class='br mk' style='overflow:visible'><span style='width:100%;background:linear-gradient(90deg,#E6F2E4,#2E7D32);border-radius:7px'></span><u style='left:"
+			& ( FORMAT(MIN(DIVIDE(_be,_pt),1)*100,"0.0","en-US") )
+			& "%'></u></div><div class='lgd'><span>margem de segurança <b style='color:#1B5E20'>"
+			& ( FORMAT(_pt-_be,"#,0.0") )
+			& " sc/ha</b></span></div></div> <div class='dt'><div class='k'>PRODUTIVIDADE · DETALHE</div>Verão: <b>"
+			& ( FORMAT([Produtividade Verão (sc/ha)],"#,0.0") )
+			& " sc/ha</b><br>Safrinha: <b>"
+			& ( FORMAT([Produtividade Safrinha (sc/ha)],"#,0.0") )
+			& " sc/ha</b><br>Break-even = custo/ha ÷ preço médio</div></div> </div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: c0042d45-a225-523e-bb30-fa59b4ad8fb5
+
+	/// Narrativa automática com 4 insights calculados.
+	measure 'HTML Leitura Executiva' =
+			VAR _tf = TOPN ( 1, FILTER ( ALLSELECTED ( Dim_Fazenda[NomeFazenda] ), NOT ISBLANK ( [Receita Bruta] ) ), [Receita Bruta], DESC )
+			VAR _tfN = MAXX ( _tf, Dim_Fazenda[NomeFazenda] )
+			VAR _tfR = MAXX ( _tf, [Receita Bruta] )
+			VAR _tfM = MAXX ( _tf, [Margem Bruta %] )
+			VAR _cul =
+			    FILTER (
+			        ADDCOLUMNS ( ALLSELECTED ( Dim_Cultura[Cultura] ), "@m", [Margem Bruta %], "@c", [Custo de Produção] ),
+			        NOT ISBLANK ( [@m] ) && NOT ISBLANK ( [@c] )
+			    )
+			VAR _b = TOPN ( 1, _cul, [@m], DESC )
+			VAR _bN = MAXX ( _b, Dim_Cultura[Cultura] )
+			VAR _bM = MAXX ( _b, [@m] )
+			VAR _w = TOPN ( 1, _cul, [@m], ASC )
+			VAR _wN = MAXX ( _w, Dim_Cultura[Cultura] )
+			VAR _wM = MAXX ( _w, [@m] )
+			VAR _lf =
+			    TOPN (
+			        1,
+			        FILTER ( ADDCOLUMNS ( ALLSELECTED ( Dim_Fazenda[NomeFazenda] ), "@m", [Margem Bruta %], "@a", [Área Plantada (ha)] ), NOT ISBLANK ( [@m] ) ),
+			        [@m], ASC
+			    )
+			VAR _lfN = MAXX ( _lf, Dim_Fazenda[NomeFazenda] )
+			VAR _lfM = MAXX ( _lf, [@m] )
+			VAR _lfA = MAXX ( _lf, [@a] )
+			RETURN
+			IF ( ISBLANK ( [Receita Bruta] ), "<div style='font:12px Segoe UI;color:#5F6B5F;padding:20px'>Sem dados para os filtros selecionados.</div>",
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .bx{position:absolute;inset:2px;background:rgba(255,255,255,.96);border:1px solid #E8E2CF;border-radius:16px;padding:14px 18px;box-shadow:0 6px 18px rgba(14,42,18,.08);animation:fu .8s .2s both} .hh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px} .hh b{font-family:'Montserrat','Segoe UI Semibold',sans-serif;color:#1B5E20;font-size:14px;font-weight:800} .hh span{font-size:9.5px;letter-spacing:.14em;color:#8A7A40;font-weight:700} .gd{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px} .it{display:flex;gap:10px;align-items:flex-start;font-size:11.2px;line-height:1.45;color:#3A423A;opacity:0;animation:fu .7s both} .it:nth-child(1){animation-delay:.35s}.it:nth-child(2){animation-delay:.5s}.it:nth-child(3){animation-delay:.65s}.it:nth-child(4){animation-delay:.8s} .nb{flex:none;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#F0D27A;font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(201,162,39,.25)} .it b{color:#1B5E20}.it em{font-style:normal;color:#B23B2E;font-weight:700}</style><div class='bx'> <div class='hh'><b>Leitura executiva</b><span>GERADA A PARTIR DOS FILTROS ATIVOS</span></div> <div class='gd'> <div class='it'><div class='nb'>01</div><div><b>"
+			& ( _tfN )
+			& "</b> lidera a receita com "
+			& ( "R$ " & FORMAT ( DIVIDE ( _tfR, 1000000 ), "#,0.0" ) & " mi" )
+			& " e margem de "
+			& ( FORMAT(_tfM,"0.0%") )
+			& ".</div></div> <div class='it'><div class='nb'>02</div><div><b>"
+			& ( _bN )
+			& "</b> é a cultura mais rentável ("
+			& ( FORMAT(_bM,"0.0%") )
+			& " de margem); "
+			& ( IF(_wM<0,"<em>" & _wN & "</em> opera no prejuízo (" & FORMAT(_wM,"0.0%") & ")","<b>" & _wN & "</b> tem a menor margem (" & FORMAT(_wM,"0.0%") & ")") )
+			& ".</div></div> <div class='it'><div class='nb'>03</div><div><b>"
+			& ( _lfN )
+			& "</b> tem a menor margem do portfólio ("
+			& ( FORMAT(_lfM,"0.0%") )
+			& ") em "
+			& ( FORMAT(DIVIDE(_lfA,1000),"#,0.0") )
+			& " mil ha — prioridade de revisão de custo e mix.</div></div> <div class='it'><div class='nb'>04</div><div>Exportação gera <b>"
+			& ( FORMAT([% Exportação],"0%") )
+			& "</b> da receita e o Barter cobre <b>"
+			& ( FORMAT([% Barter],"0%") )
+			& "</b> — proteção natural contra o custo de insumos.</div></div> </div></div>" )
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: bb67971a-301f-5ecb-9f1e-5298df717138
+
+	/// Comparativo animado entre os ciclos de safra.
+	measure 'HTML Verao x Safrinha' =
+			VAR _maxA = MAX ( [Área Verão (ha)], [Área Safrinha (ha)] )
+			RETURN
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .bx{position:absolute;inset:2px;background:rgba(255,255,255,.96);border:1px solid #E8E2CF;border-radius:16px;padding:12px 16px;box-shadow:0 6px 18px rgba(14,42,18,.08);animation:fu .8s both} .hh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px} .hh b{font-family:'Montserrat','Segoe UI Semibold',sans-serif;color:#1B5E20;font-size:13.5px;font-weight:800}.hh span{font-size:9.5px;color:#6B756B} table{width:100%;border-collapse:collapse;font-size:11px} th{font-size:8.5px;letter-spacing:.12em;color:#8A7A40;font-weight:700;text-align:left;padding:0 6px 4px;text-transform:uppercase} td{padding:6px;border-top:1px solid #F0ECE0;white-space:nowrap} td.n{font-weight:800;color:#1B5E20;font-size:12px}td.n i{display:block;font-style:normal;font-weight:400;color:#6B756B;font-size:9px} .bw{height:8px;background:#EEF3EC;border-radius:8px;width:100%;min-width:70px;overflow:hidden} .bw span{display:block;height:100%;border-radius:8px;animation:gw 1.2s cubic-bezier(.2,.7,.2,1) .3s both} .vv{font-weight:700;color:#333}.vv small{color:#6B756B;font-weight:400}</style><div class='bx'> <div class='hh'><b>Verão × Safrinha · eficiência por ciclo</b><span>Safrinha usa o mesmo solo: receita extra com ~"
+			& ( FORMAT(DIVIDE([Custo/ha Safrinha],[Custo/ha Verão]),"0%") )
+			& " do custo/ha</span></div> <table><tr><th>Ciclo</th><th>Área</th><th>Produtiv.</th><th>Custo/ha</th><th>Margem</th></tr> <tr><td class='n'>Verão<i>Soja · Algodão</i></td> <td><div class='vv'>"
+			& ( FORMAT(DIVIDE([Área Verão (ha)],1000),"#,0.0") )
+			& " <small>mil ha</small></div><div class='bw'><span style='width:"
+			& ( FORMAT(DIVIDE([Área Verão (ha)],_maxA)*100,"0.0","en-US") )
+			& "%;background:#1B5E20'></span></div></td> <td class='vv'>"
+			& ( FORMAT([Produtividade Verão (sc/ha)],"#,0.0") )
+			& " <small>sc/ha</small></td> <td class='vv'>R$ "
+			& ( FORMAT([Custo/ha Verão],"#,0") )
+			& " <small>/ha</small></td> <td><div class='vv'>"
+			& ( FORMAT([Margem % Verão],"0.0%") )
+			& "</div><div class='bw'><span style='width:"
+			& ( FORMAT(MIN(MAX([Margem % Verão],0),1)*100,"0.0","en-US") )
+			& "%;background:linear-gradient(90deg,#2E7D32,#C9A227)'></span></div></td></tr> <tr><td class='n'>Safrinha<i>Milho · Sorgo</i></td> <td><div class='vv'>"
+			& ( FORMAT(DIVIDE([Área Safrinha (ha)],1000),"#,0.0") )
+			& " <small>mil ha</small></div><div class='bw'><span style='width:"
+			& ( FORMAT(DIVIDE([Área Safrinha (ha)],_maxA)*100,"0.0","en-US") )
+			& "%;background:#C9A227'></span></div></td> <td class='vv'>"
+			& ( FORMAT([Produtividade Safrinha (sc/ha)],"#,0.0") )
+			& " <small>sc/ha</small></td> <td class='vv'>R$ "
+			& ( FORMAT([Custo/ha Safrinha],"#,0") )
+			& " <small>/ha</small></td> <td><div class='vv'>"
+			& ( FORMAT([Margem % Safrinha],"0.0%") )
+			& "</div><div class='bw'><span style='width:"
+			& ( FORMAT(MIN(MAX([Margem % Safrinha],0),1)*100,"0.0","en-US") )
+			& "%;background:linear-gradient(90deg,#2E7D32,#C9A227)'></span></div></td></tr> </table></div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: d705d81d-6209-516f-9a27-7015a23bda3f
+
+	/// Faixa de KPIs de custo, margem, break-even e clima.
+	measure 'HTML KPIs Custos' =
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .wr{position:absolute;inset:4px 2px 2px 2px;display:flex;gap:12px} .cd{position:relative;flex:1;min-width:0;background:rgba(255,255,255,.96);border:1px solid #E8E2CF;border-radius:16px;padding:12px 14px 10px 18px;overflow:hidden;box-shadow:0 6px 18px rgba(14,42,18,.08);animation:fu .7s cubic-bezier(.2,.7,.2,1) both;transition:transform .35s,box-shadow .35s,border-color .35s} .cd:before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#C9A227,#1B5E20)} .cd:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(14,42,18,.18);border-color:#C9A227} .cd:nth-child(2){animation-delay:.08s}.cd:nth-child(3){animation-delay:.16s}.cd:nth-child(4){animation-delay:.24s}.cd:nth-child(5){animation-delay:.32s}.cd:nth-child(6){animation-delay:.40s} .lb{font-size:9.5px;letter-spacing:.13em;color:#5F6B5F;font-weight:700;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .vl{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:25px;font-weight:800;color:#1B5E20;line-height:1.15;margin-top:5px;white-space:nowrap} .vl small{font-size:12px;font-weight:700;color:#2E7D32;margin-left:2px} .rw{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:9.5px;color:#6B756B;white-space:nowrap} .d{font-weight:700;padding:2px 7px;border-radius:20px;font-size:9.5px} .up{background:#E6F2E4;color:#1B5E20}.dn{background:#FBE9E5;color:#B23B2E}.nt{background:#F1EEE4;color:#7A6A3A} .vz{position:absolute;left:18px;right:14px;bottom:10px;height:20px} .br{height:7px;border-radius:7px;background:#EEF3EC;overflow:hidden;display:flex;margin-top:7px} .br span{display:block;height:100%;animation:gw 1.3s cubic-bezier(.2,.7,.2,1) .3s both} .lgd{display:flex;gap:8px;font-size:8.5px;color:#6B756B;margin-top:3px;white-space:nowrap} .lgd i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:3px} .sp polyline{stroke-dasharray:100;animation:dr 1.8s ease-out .35s both} .dt{position:absolute;inset:0;background:linear-gradient(135deg,#1B5E20,#0E2A12);color:#fff;padding:12px 14px 10px 18px;opacity:0;transform:translateY(10px);transition:all .35s;font-size:10.5px;line-height:1.55} .cd:hover .dt{opacity:1;transform:none} .dt .k{font-size:9px;letter-spacing:.14em;color:#C9A227;font-weight:800;margin-bottom:3px} .dt b{color:#F0D27A;font-weight:700} .mk{position:relative}.mk u{position:absolute;top:-3px;width:2px;height:13px;background:#B23B2E;border-radius:2px} .vl{font-size:22px}</style><div class='wr'> <div class='cd'><div class='lb'>Custo de produção</div><div class='vl'>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Custo de Produção], 1000000 ), "#,0.0" ) & " mi" )
+			& "</div> <div class='rw'><span>R$ "
+			& ( FORMAT([Custo por Hectare],"#,0") )
+			& "/ha no período</span></div> <div class='dt'><div class='k'>CUSTO · DETALHE</div>Grãos: <b>R$ "
+			& ( FORMAT([Custo por Hectare Grãos],"#,0") )
+			& "/ha</b><br>Ano ref.: "
+			& ( IF ( ISBLANK ( [Custo por Hectare YoY %] ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( [Custo por Hectare YoY %] >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( [Custo por Hectare YoY %] ), "0.0%" ) & "</span>" ) )
+			& " no custo/ha</div></div> <div class='cd'><div class='lb'>Desembolso</div><div class='vl'>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Desembolso Operacional], 1000000 ), "#,0.0" ) & " mi" )
+			& "</div> <div class='rw'><span>maior peso: <b style='color:#1B5E20'>"
+			& ( [Maior Categoria de Custo] )
+			& "</b></span></div> <div class='dt'><div class='k'>DESEMBOLSO · DETALHE</div>"
+			& ( [Maior Categoria de Custo] )
+			& ": <b>"
+			& ( FORMAT(CALCULATE([% do Desembolso],TOPN(1,VALUES(Fato_Custos[CategoriaCusto]),[Desembolso Operacional],DESC)),"0%") )
+			& "</b> do total<br>Variável: <b>"
+			& ( FORMAT([% Custo Variável],"0%") )
+			& "</b> · Fixo: <b>"
+			& ( FORMAT(1-[% Custo Variável],"0%") )
+			& "</b></div></div> <div class='cd'><div class='lb'>Margem bruta</div><div class='vl'>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Margem Bruta], 1000000 ), "#,0.0" ) & " mi" )
+			& "</div> <div class='rw'><span class='d "
+			& ( IF([Margem Bruta %]>=0,"up","dn") )
+			& "'>"
+			& ( FORMAT([Margem Bruta %],"0.0%") )
+			& "</span><span>R$ "
+			& ( FORMAT([Margem por Hectare],"#,0") )
+			& "/ha</span></div> <div class='dt'><div class='k'>MARGEM · DETALHE</div>Receita: <b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Receita Bruta], 1000000 ), "#,0.0" ) & " mi" )
+			& "</b><br>Custo produção: <b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Custo de Produção], 1000000 ), "#,0.0" ) & " mi" )
+			& "</b></div></div> <div class='cd'><div class='lb'>Break-even grãos</div><div class='vl'>"
+			& ( FORMAT([Break-even (sc/ha)],"#,0.0") )
+			& "<small>sc/ha</small></div> <div class='rw'><span class='d up'>+"
+			& ( FORMAT([Margem de Segurança (sc/ha)],"#,0.0") )
+			& " sc/ha</span><span>de folga</span></div> <div class='dt'><div class='k'>BREAK-EVEN · COMO LER</div>Custo/ha grãos ÷ preço médio (R$ "
+			& ( FORMAT([Preço Médio Grãos (R$/sc)],"#,0.00") )
+			& "/sc). Produtividade atual: <b>"
+			& ( FORMAT([Produtividade Média (sc/ha)],"#,0.0") )
+			& " sc/ha</b></div></div> <div class='cd'><div class='lb'>Clima · chuva média</div><div class='vl'>"
+			& ( FORMAT([Chuva Média Mensal (mm)],"#,0") )
+			& "<small>mm/mês</small></div> <div class='rw'><span>"
+			& ( FORMAT([Temperatura Média (°C)],"0.0") )
+			& " °C · UR "
+			& ( FORMAT([Umidade Relativa Média],"0") )
+			& "%</span></div> <div class='dt'><div class='k'>CLIMA · DETALHE</div>Dias de chuva: <b>"
+			& ( FORMAT([Dias de Chuva (média/mês)],"0.0") )
+			& "/mês</b><br>Acumulado: <b>"
+			& ( FORMAT([Precipitação Acumulada (mm)],"#,0") )
+			& " mm</b></div></div> <div class='cd'><div class='lb'>Chuva × produtividade</div><div class='vl'>r = "
+			& ( FORMAT([Correlação Chuva x Produtividade (r)],"0.00") )
+			& "</div> <div class='rw' style='white-space:normal;line-height:1.25'><span>"
+			& ( [Leitura da Correlação] )
+			& "</span></div> <div class='dt'><div class='k'>CORRELAÇÃO · MÉTODO</div>Pearson entre chuva média mensal e produtividade de grãos por <b>UF × Safra</b> (ver dispersão ao lado).</div></div> </div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: 5fe2f5f1-27b9-56cc-86d6-8b72e53cbf12
+
+	/// Fundo animado (slide-in) do painel lateral de filtros.
+	measure 'HTML Painel Filtros' =
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .pn{position:absolute;inset:0;background:#FBFAF6;border-radius:22px 0 0 22px;box-shadow:-18px 0 40px rgba(14,42,18,.35);overflow:hidden;animation:si .55s cubic-bezier(.2,.8,.2,1) both} @keyframes si{from{transform:translateX(60px);opacity:0}to{transform:none;opacity:1}} .ph{height:92px;background:linear-gradient(120deg,#0E2A12,#1B5E20 60%,#2E7D32);padding:20px 22px;position:relative} .ph:after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#C9A227,#F3D77A,#C9A227)} .ph b{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:19px;color:#fff;font-weight:800;display:block} .ph span{font-size:10px;color:#BFD8BA;letter-spacing:.04em} .x{position:absolute;left:84.0%;top:3.2%;width:11.0%;height:5.4%;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center} .ft{position:absolute;left:0;right:0;bottom:0;height:9.5%;border-top:1px solid #ECE6D4;background:#F4F1E7} .bt{position:absolute;top:91.8%;height:5.8%;border-radius:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;letter-spacing:.02em} .b1{left:6.0%;width:42.0%;border:1.5px solid #C9A227;color:#8A6D12;background:#fff} .b2{left:52.0%;width:42.0%;background:linear-gradient(135deg,#2E7D32,#1B5E20);color:#fff;box-shadow:0 6px 14px rgba(27,94,32,.35)} .sec{position:absolute;left:22px;right:22px;font-size:8.5px;letter-spacing:.18em;color:#8A7A40;font-weight:800} .sec:after{content:'';display:block;height:1px;background:#ECE6D4;margin-top:4px}</style><div class='pn'> <div class='ph'><b>Filtros</b><span>Seleções sincronizadas entre as páginas</span></div><div class='x'>✕</div> <div class='sec' style='top:13.2%'>TEMPO</div> <div class='sec' style='top:31.6%'>OPERAÇÃO</div> <div class='sec' style='top:68.2%'>COMERCIAL</div> <div class='ft'></div> <div class='bt b1'>↺ Limpar filtros</div><div class='bt b2'>Aplicar ✓</div> </div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: e60438a6-6d32-5b14-8b4f-5a7263de0cf4
+
+	/// Anel pulsante ao redor do botão INICIAR.
+	measure 'HTML Capa Pulso' =
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .rg{position:absolute;left:20px;top:14px;width:246px;height:62px;border-radius:40px;border:2px solid rgba(243,215,122,.95);animation:pu 2.6s cubic-bezier(.2,.7,.2,1) infinite} .rg.b{animation-delay:1.3s} @keyframes pu{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.16,1.45);opacity:0}}</style><div class='rg'></div><div class='rg b'></div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: 95b9f87b-5cb7-5b59-bb39-f01b2174234a
+
+	/// Manifesto da marca com fade-in.
+	measure 'HTML Capa Manifesto' =
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .tg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fu 1.4s .6s both} .tg b{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-style:italic;font-weight:600;color:#fff;font-size:15px;text-shadow:0 2px 10px rgba(0,0,0,.55)} .tg span{margin-top:7px;font-size:10px;letter-spacing:.32em;color:#F3D77A;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.6)}</style><div class='tg'><b>“Cultivar o futuro do Cerrado com excelência e responsabilidade.”</b><span>INTELIGÊNCIA DE SAFRA · 10 FAZENDAS · 5 ESTADOS · 2024–2026</span></div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: 4e733514-9083-5ea7-a9a1-cd7c2f34fb83
+
+	/// Tooltip rico para fazenda / fazenda × cultura.
+	measure 'HTML Tooltip Fazenda' =
+			VAR _faz = SELECTEDVALUE ( Dim_Fazenda[NomeFazenda] )
+			VAR _cul = IF ( ISFILTERED ( Dim_Cultura[Cultura] ), SELECTEDVALUE ( Dim_Cultura[Cultura] ) )
+			VAR _kicker = IF ( ISBLANK ( _faz ), "PORTFÓLIO", "FAZENDA" ) & IF ( NOT ISBLANK ( _cul ), " · " & UPPER ( _cul ), "" )
+			VAR _titulo = COALESCE ( _faz, "AgroCerrado S.A." )
+			VAR _sub =
+			    IF (
+			        ISBLANK ( _faz ),
+			        "10 fazendas · MT, GO, MS, BA e MG",
+			        SELECTEDVALUE ( Dim_Fazenda[Municipio] ) & " / " & SELECTEDVALUE ( Dim_Fazenda[UF] ) & " · "
+			            & SELECTEDVALUE ( Dim_Fazenda[TipoPropriedade] ) & " · " & FORMAT ( [Área Total Fazendas (ha)], "#,0" ) & " ha"
+			    )
+			VAR _un = IF ( _cul = "Algodão", "@/ha", "sc/ha" )
+			VAR _prod = IF ( NOT ISBLANK ( _cul ), [Produtividade (un/ha)], [Produtividade Média (sc/ha)] )
+			VAR _idx =
+			    IF (
+			        NOT ISBLANK ( _cul ),
+			        [Índice Produtividade vs Portfólio],
+			        DIVIDE ( [Produtividade Média (sc/ha)], CALCULATE ( [Produtividade Média (sc/ha)], REMOVEFILTERS ( Dim_Fazenda ) ) )
+			    )
+			VAR _rank = [Ranking Fazenda (Portfólio)]
+			VAR _insight =
+			    IF (
+			        ISBLANK ( _idx ),
+			        "Sem colheita registrada para este recorte.",
+			        "Produtividade <b>" & FORMAT ( ABS ( _idx - 1 ), "0.0%" ) & IF ( _idx >= 1, " acima", " abaixo" )
+			            & "</b> da média do portfólio" & IF ( NOT ISBLANK ( _cul ), " em " & _cul, "" )
+			            & " · margem/ha <b>R$ " & FORMAT ( [Margem por Hectare], "#,0" ) & "</b>"
+			    )
+			RETURN
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .tt{position:absolute;inset:0;padding:14px 16px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,rgba(201,162,39,.20),transparent 55%),linear-gradient(160deg,#143D18,#0B2410);animation:fu .35s both} .kk{font-size:9px;letter-spacing:.2em;color:#C9A227;font-weight:800} .ti{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:16px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .su{font-size:9.5px;color:#A9C7A3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px} .mt{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px} .mt i{display:block;font-style:normal;font-size:8px;letter-spacing:.12em;color:#A9C7A3;font-weight:700;text-transform:uppercase} .mt b{display:block;font-size:13.5px;margin-top:2px;white-space:nowrap} .mt b small{font-size:9px;color:#A9C7A3;font-weight:400} .d{font-weight:700;padding:1px 6px;border-radius:12px;font-size:9.5px} .up{background:rgba(129,199,132,.18);color:#9BE29F}.dn{background:rgba(239,83,80,.18);color:#FF9C94}.nt{background:rgba(255,255,255,.08);color:#C9C9C9} .in{margin-top:10px;border-left:3px solid #C9A227;padding:5px 9px;font-size:10.2px;line-height:1.4;background:rgba(201,162,39,.08);border-radius:0 8px 8px 0;color:#EDEBD9} .in b{color:#F0D27A}</style><div class='tt'> <div class='kk'>"
+			& ( _kicker )
+			& "</div><div class='ti'>"
+			& ( _titulo )
+			& "</div><div class='su'>"
+			& ( _sub )
+			& "</div> <div class='gr'> <div class='mt'><i>Receita</i><b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Receita Bruta], 1000000 ), "#,0.0" ) & " mi" )
+			& "</b></div> <div class='mt'><i>Margem bruta</i><b>"
+			& ( FORMAT([Margem Bruta %],"0.0%") )
+			& "</b></div> <div class='mt'><i>Produtividade</i><b>"
+			& ( FORMAT(_prod,"#,0.0") )
+			& " <small>"
+			& ( _un )
+			& "</small></b></div> <div class='mt'><i>Custo / ha</i><b>R$ "
+			& ( FORMAT([Custo por Hectare],"#,0") )
+			& "</b></div> <div class='mt'><i>Ranking receita</i><b>"
+			& ( IF(ISBLANK(_faz),"—","#" & _rank & " <small>de " & COUNTROWS(ALL(Dim_Fazenda)) & "</small>") )
+			& "</b></div> <div class='mt'><i>Receita YoY</i><b>"
+			& ( IF ( ISBLANK ( [Receita Bruta YoY %] ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( [Receita Bruta YoY %] >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( [Receita Bruta YoY %] ), "0.0%" ) & "</span>" ) )
+			& "</b></div> </div> <div class='in'>"
+			& ( _insight )
+			& "</div></div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: 6363b5f3-ace4-54ec-93ef-668a83dc695e
+
+	/// Tooltip rico para cliente, contrato e período.
+	measure 'HTML Tooltip Comercial' =
+			VAR _cli = IF ( ISFILTERED ( Dim_Cliente[NomeCliente] ), SELECTEDVALUE ( Dim_Cliente[NomeCliente] ) )
+			VAR _ctr = IF ( ISFILTERED ( Fato_Vendas[TipoContrato] ), SELECTEDVALUE ( Fato_Vendas[TipoContrato] ) )
+			VAR _cul = IF ( ISFILTERED ( Dim_Cultura[Cultura] ), SELECTEDVALUE ( Dim_Cultura[Cultura] ) )
+			VAR _mes = IF ( ISFILTERED ( Dim_Tempo[MesAno] ), SELECTEDVALUE ( Dim_Tempo[MesAno] ) )
+			VAR _tri = IF ( ISFILTERED ( Dim_Tempo[AnoTrimestre] ), SELECTEDVALUE ( Dim_Tempo[AnoTrimestre] ) )
+			VAR _per = COALESCE ( _mes, _tri )
+			VAR _kicker =
+			    SWITCH (
+			        TRUE (),
+			        NOT ISBLANK ( _cli ), "CLIENTE · " & UPPER ( SELECTEDVALUE ( Dim_Cliente[TipoCliente] ) ),
+			        NOT ISBLANK ( _ctr ), "MODALIDADE DE CONTRATO",
+			        NOT ISBLANK ( _per ), "PERÍODO" & IF ( NOT ISBLANK ( _cul ), " · " & UPPER ( _cul ), "" ),
+			        "COMERCIAL"
+			    )
+			VAR _titulo = COALESCE ( _cli, _ctr, IF ( NOT ISBLANK ( _per ), _per & IF ( NOT ISBLANK ( _cul ), " · " & _cul, "" ) ), "Receita consolidada" )
+			VAR _sub =
+			    SWITCH (
+			        TRUE (),
+			        NOT ISBLANK ( _cli ), SELECTEDVALUE ( Dim_Cliente[Canal] ) & " · porte " & SELECTEDVALUE ( Dim_Cliente[Porte] ) & " · sede " & SELECTEDVALUE ( Dim_Cliente[UFCliente] ),
+			        NOT ISBLANK ( _per ), "Acumulado no ano: " & "R$ " & FORMAT ( DIVIDE ( [Receita Acumulada no Ano], 1000000 ), "#,0.0" ) & " mi",
+			        "Participação no total: " & FORMAT ( [Share Receita Total %], "0.0%" )
+			    )
+			VAR _usaMoM = NOT ISBLANK ( _mes )
+			VAR _lblVar = IF ( _usaMoM, "Vs mês anterior", IF ( NOT ISBLANK ( _per ), "Vs ano anterior", "YoY (ano ref.)" ) )
+			VAR _var = IF ( _usaMoM, [Receita MoM %], IF ( NOT ISBLANK ( _per ), [Receita vs AA %], [Receita Bruta YoY %] ) )
+			VAR _chipVar = IF ( ISBLANK ( _var ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( _var >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( _var ), "0.0%" ) & "</span>" )
+			VAR _pm = [Preço Médio (R$/un)]
+			VAR _pmE = IF ( NOT ISBLANK ( _per ), CALCULATE ( [Preço Médio (R$/un)], REMOVEFILTERS ( Dim_Tempo ) ), [Preço Médio Empresa (R$/un)] )
+			VAR _dif = DIVIDE ( _pm - _pmE, _pmE )
+			VAR _insight =
+			    IF (
+			        NOT ISBLANK ( _cli ),
+			        "Share de <b>" & FORMAT ( [Share Receita Total %], "0.0%" ) & "</b> da receita · preço médio <b>"
+			            & FORMAT ( ABS ( _dif ), "0.0%" ) & IF ( _dif >= 0, " acima", " abaixo" ) & "</b> da média da empresa",
+			        "Exportação <b>" & FORMAT ( [% Exportação], "0%" ) & "</b> · Barter <b>" & FORMAT ( [% Barter], "0%" )
+			            & "</b> · preço vs média histórica: <b>" & FORMAT ( _dif, "+0.0%;-0.0%;0.0%" ) & "</b>"
+			    )
+			RETURN
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .tt{position:absolute;inset:0;padding:14px 16px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,rgba(201,162,39,.20),transparent 55%),linear-gradient(160deg,#143D18,#0B2410);animation:fu .35s both} .kk{font-size:9px;letter-spacing:.2em;color:#C9A227;font-weight:800} .ti{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:16px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .su{font-size:9.5px;color:#A9C7A3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px} .mt{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px} .mt i{display:block;font-style:normal;font-size:8px;letter-spacing:.12em;color:#A9C7A3;font-weight:700;text-transform:uppercase} .mt b{display:block;font-size:13.5px;margin-top:2px;white-space:nowrap} .mt b small{font-size:9px;color:#A9C7A3;font-weight:400} .d{font-weight:700;padding:1px 6px;border-radius:12px;font-size:9.5px} .up{background:rgba(129,199,132,.18);color:#9BE29F}.dn{background:rgba(239,83,80,.18);color:#FF9C94}.nt{background:rgba(255,255,255,.08);color:#C9C9C9} .in{margin-top:10px;border-left:3px solid #C9A227;padding:5px 9px;font-size:10.2px;line-height:1.4;background:rgba(201,162,39,.08);border-radius:0 8px 8px 0;color:#EDEBD9} .in b{color:#F0D27A}</style><div class='tt'> <div class='kk'>"
+			& ( _kicker )
+			& "</div><div class='ti'>"
+			& ( _titulo )
+			& "</div><div class='su'>"
+			& ( _sub )
+			& "</div> <div class='gr'> <div class='mt'><i>Receita</i><b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Receita Bruta], 1000000 ), "#,0.0" ) & " mi" )
+			& "</b></div> <div class='mt'><i>Volume</i><b>"
+			& ( FORMAT(DIVIDE([Volume Vendido],1000),"#,0") )
+			& " <small>mil un</small></b></div> <div class='mt'><i>Preço médio</i><b>R$ "
+			& ( FORMAT([Preço Médio (R$/un)],"#,0.00") )
+			& "</b></div> <div class='mt'><i>Contratos</i><b>"
+			& ( FORMAT([Nº Contratos],"#,0") )
+			& "</b></div> <div class='mt'><i>Ticket médio</i><b>"
+			& ( "R$ " & FORMAT ( DIVIDE ( [Ticket Médio por Contrato], 1000000 ), "#,0.00" ) & " mi" )
+			& "</b></div> <div class='mt'><i>"
+			& ( _lblVar )
+			& "</i><b>"
+			& ( _chipVar )
+			& "</b></div> </div> <div class='in'>"
+			& ( _insight )
+			& "</div></div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: e443592a-99ab-52f6-8288-0ac1f93c468a
+
+	/// Tooltip rico para categoria de custo, clima (UF × Safra) e cultura.
+	measure 'HTML Tooltip Custos' =
+			VAR _cat = IF ( ISFILTERED ( Fato_Custos[CategoriaCusto] ), SELECTEDVALUE ( Fato_Custos[CategoriaCusto] ) )
+			VAR _uf = IF ( ISFILTERED ( Dim_Regiao[UF] ), SELECTEDVALUE ( Dim_Regiao[UF] ) )
+			VAR _cul = IF ( ISFILTERED ( Dim_Cultura[Cultura] ), SELECTEDVALUE ( Dim_Cultura[Cultura] ) )
+			VAR _modo = SWITCH ( TRUE (), NOT ISBLANK ( _cat ), "cat", NOT ISBLANK ( _uf ), "clima", "cultura" )
+			VAR _kicker = SWITCH ( _modo, "cat", "CATEGORIA DE CUSTO", "clima", "CLIMA × PRODUTIVIDADE", "CULTURA · RENTABILIDADE" )
+			VAR _titulo =
+			    SWITCH (
+			        _modo,
+			        "cat", _cat,
+			        "clima", SELECTEDVALUE ( Dim_Regiao[Estado] ) & IF ( HASONEVALUE ( Dim_Tempo[Safra] ), " · Safra " & SELECTEDVALUE ( Dim_Tempo[Safra] ), "" ),
+			        COALESCE ( _cul, "Todas as culturas" )
+			    )
+			VAR _sub =
+			    SWITCH (
+			        _modo,
+			        "cat", "Principal fornecedor: " & COALESCE ( [Fornecedor Principal], "—" ),
+			        "clima", "Região " & SELECTEDVALUE ( Dim_Regiao[Regiao] ) & " · bioma " & SELECTEDVALUE ( Dim_Regiao[Bioma] ),
+			        "Break-even " & FORMAT ( [Break-even (sc/ha)], "#,0.0" ) & " sc/ha · ciclo " & SELECTEDVALUE ( Dim_Cultura[CicloDias] ) & " dias"
+			    )
+			VAR _tiles = SWITCH ( _modo, "cat", "<div class='mt'><i>Desembolso</i><b>" & "R$ " & FORMAT ( DIVIDE ( [Desembolso Operacional], 1000000 ), "#,0.0" ) & " mi" & "</b></div>" & "<div class='mt'><i>% do total</i><b>" & FORMAT ( [% do Desembolso], "0.0%" ) & "</b></div>" & "<div class='mt'><i>Variável</i><b>" & FORMAT ( [% Custo Variável], "0%" ) & "</b></div>" & "<div class='mt'><i>YoY (ano ref.)</i><b>" & IF ( ISBLANK ( [Desembolso Operacional YoY %] ), "<span class='d nt'>— sem base</span>", "<span class='d " & IF ( [Desembolso Operacional YoY %] >= 0, "up'>▲ ", "dn'>▼ " ) & FORMAT ( ABS ( [Desembolso Operacional YoY %] ), "0.0%" ) & "</span>" ) & "</b></div>" & "<div class='mt'><i>Fornecedores</i><b>" & FORMAT ( DISTINCTCOUNT ( Fato_Custos[FornecedorKey] ), "0" ) & "</b></div>" & "<div class='mt'><i>R$ / ha físico</i><b>" & "R$ " & FORMAT ( DIVIDE ( [Desembolso Operacional], [Área Total Fazendas (ha)] ), "#,0" ) & "</b></div>", "clima", "<div class='mt'><i>Chuva média</i><b>" & FORMAT ( [Chuva Média Mensal (mm)], "#,0" ) & " <small>mm/mês</small>" & "</b></div>" & "<div class='mt'><i>Acumulado</i><b>" & FORMAT ( [Precipitação Acumulada (mm)], "#,0" ) & " <small>mm</small>" & "</b></div>" & "<div class='mt'><i>Temperatura</i><b>" & FORMAT ( [Temperatura Média (°C)], "0.0" ) & " <small>°C</small>" & "</b></div>" & "<div class='mt'><i>Umidade</i><b>" & FORMAT ( [Umidade Relativa Média], "0" ) & " <small>%</small>" & "</b></div>" & "<div class='mt'><i>Produtividade</i><b>" & FORMAT ( [Produtividade Média (sc/ha)], "#,0.0" ) & " <small>sc/ha</small>" & "</b></div>" & "<div class='mt'><i>Área grãos</i><b>" & FORMAT ( DIVIDE ( [Área Grãos (ha)], 1000 ), "#,0.0" ) & " <small>mil ha</small>" & "</b></div>", "<div class='mt'><i>Custo / ha</i><b>" & "R$ " & FORMAT ( [Custo por Hectare], "#,0" ) & "</b></div>" & "<div class='mt'><i>Margem bruta</i><b>" & FORMAT ( [Margem Bruta %], "0.0%" ) & "</b></div>" & "<div class='mt'><i>Margem / ha</i><b>" & "R$ " & FORMAT ( [Margem por Hectare], "#,0" ) & "</b></div>" & "<div class='mt'><i>Receita</i><b>" & "R$ " & FORMAT ( DIVIDE ( [Receita Bruta], 1000000 ), "#,0.0" ) & " mi" & "</b></div>" & "<div class='mt'><i>Preço médio</i><b>" & "R$ " & FORMAT ( [Preço Médio (R$/un)], "#,0.00" ) & "</b></div>" & "<div class='mt'><i>Produtividade</i><b>" & FORMAT ( [Produtividade (un/ha)], "#,0.0" ) & IF ( SELECTEDVALUE ( Dim_Cultura[Cultura] ) = "Algodão", " <small>@/ha</small>", " <small>sc/ha</small>" ) & "</b></div>" )
+			VAR _mg = [Margem Bruta %]
+			VAR _insight =
+			    SWITCH (
+			        _modo,
+			        "cat", "Cada 1% de redução nesta categoria libera <b>" & "R$ " & FORMAT ( DIVIDE ( [Desembolso Operacional] * 0.01, 1000000 ), "#,0.00" ) & " mi" & "</b> de caixa.",
+			        "clima", "Chuva " & IF ( [Chuva Média Mensal (mm)] >= CALCULATE ( [Chuva Média Mensal (mm)], REMOVEFILTERS ( Dim_Regiao ), REMOVEFILTERS ( Dim_Fazenda ) ), "<b>acima</b>", "<b>abaixo</b>" ) & " da média das regiões no mesmo período.",
+			        IF ( _mg < 0, "<b>Margem negativa</b>: rever custo/ha ou substituir por cultura de maior retorno no ciclo.", "Cada hectare gera <b>R$ " & FORMAT ( [Margem por Hectare], "#,0" ) & "</b> de margem bruta." )
+			    )
+			RETURN
+			"<style>*{box-sizing:border-box;margin:0;padding:0} html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333} #htmlViewer{overflow:hidden !important} .os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important} .mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif} @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} @keyframes gw{from{width:0}} @keyframes dr{from{stroke-dashoffset:100}to{stroke-dashoffset:0}} @keyframes sh{0%{background-position:-200% 0}100%{background-position:200% 0}} .tt{position:absolute;inset:0;padding:14px 16px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,rgba(201,162,39,.20),transparent 55%),linear-gradient(160deg,#143D18,#0B2410);animation:fu .35s both} .kk{font-size:9px;letter-spacing:.2em;color:#C9A227;font-weight:800} .ti{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:16px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .su{font-size:9.5px;color:#A9C7A3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px} .mt{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px} .mt i{display:block;font-style:normal;font-size:8px;letter-spacing:.12em;color:#A9C7A3;font-weight:700;text-transform:uppercase} .mt b{display:block;font-size:13.5px;margin-top:2px;white-space:nowrap} .mt b small{font-size:9px;color:#A9C7A3;font-weight:400} .d{font-weight:700;padding:1px 6px;border-radius:12px;font-size:9.5px} .up{background:rgba(129,199,132,.18);color:#9BE29F}.dn{background:rgba(239,83,80,.18);color:#FF9C94}.nt{background:rgba(255,255,255,.08);color:#C9C9C9} .in{margin-top:10px;border-left:3px solid #C9A227;padding:5px 9px;font-size:10.2px;line-height:1.4;background:rgba(201,162,39,.08);border-radius:0 8px 8px 0;color:#EDEBD9} .in b{color:#F0D27A}</style><div class='tt'> <div class='kk'>"
+			& ( _kicker )
+			& "</div><div class='ti'>"
+			& ( _titulo )
+			& "</div><div class='su'>"
+			& ( _sub )
+			& "</div> <div class='gr'>"
+			& ( _tiles )
+			& "</div> <div class='in'>"
+			& ( _insight )
+			& "</div></div>"
+		displayFolder: 08 HTML & Tooltips
+		lineageTag: 1dfca840-704b-57ca-a3e6-edf6a97ccb82
+
+	column Ref
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0b010780-d4d1-5260-9c8c-cf5d8db9d689
+		summarizeBy: none
+		sourceColumn: Ref
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				    Fonte = #table(type table [Ref = Int64.Type], {})
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table

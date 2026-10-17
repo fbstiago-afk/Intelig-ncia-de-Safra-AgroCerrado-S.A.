@@ -1,0 +1,76 @@
+<!-- HTML Tooltip Comercial — template legível. Trechos «...» são expressões DAX concatenadas na medida [HTML Tooltip Comercial]. -->
+<style>*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{background:transparent;overflow:hidden;font-family:'Open Sans','Segoe UI',sans-serif;color:#333}
+
+#htmlViewer{overflow:hidden !important}
+
+.os-scrollbar,.os-scrollbar-vertical,.os-scrollbar-horizontal{display:none !important}
+
+.mont{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif}
+
+@keyframes fu{from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:none}
+}
+
+@keyframes gw{from{width:0}
+}
+
+@keyframes dr{from{stroke-dashoffset:100}
+to{stroke-dashoffset:0}
+}
+
+@keyframes sh{0%{background-position:-200% 0}
+100%{background-position:200% 0}
+}
+
+.tt{position:absolute;inset:0;padding:14px 16px;color:#fff;background:radial-gradient(120% 90% at 100% 0%,rgba(201,162,39,.20),transparent 55%),linear-gradient(160deg,#143D18,#0B2410);animation:fu .35s both}
+
+.kk{font-size:9px;letter-spacing:.2em;color:#C9A227;font-weight:800}
+
+.ti{font-family:'Montserrat','Segoe UI Semibold','Segoe UI',sans-serif;font-size:16px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.su{font-size:9.5px;color:#A9C7A3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}
+
+.mt{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px}
+
+.mt i{display:block;font-style:normal;font-size:8px;letter-spacing:.12em;color:#A9C7A3;font-weight:700;text-transform:uppercase}
+
+.mt b{display:block;font-size:13.5px;margin-top:2px;white-space:nowrap}
+
+.mt b small{font-size:9px;color:#A9C7A3;font-weight:400}
+
+.d{font-weight:700;padding:1px 6px;border-radius:12px;font-size:9.5px}
+
+.up{background:rgba(129,199,132,.18);color:#9BE29F}
+.dn{background:rgba(239,83,80,.18);color:#FF9C94}
+.nt{background:rgba(255,255,255,.08);color:#C9C9C9}
+
+.in{margin-top:10px;border-left:3px solid #C9A227;padding:5px 9px;font-size:10.2px;line-height:1.4;background:rgba(201,162,39,.08);border-radius:0 8px 8px 0;color:#EDEBD9}
+
+.in b{color:#F0D27A}
+</style>
+<div class='tt'>
+
+<div class='kk'>«_kicker»</div>
+<div class='ti'>«_titulo»</div>
+<div class='su'>«_sub»</div>
+
+<div class='gr'>
+
+<div class='mt'><i>Receita</i><b>«"R$ " & FORMAT ( DIVIDE ( [Receita Bruta], 1000000 ), "#,0.0" ) & " mi"»</b></div>
+
+<div class='mt'><i>Volume</i><b>«FORMAT(DIVIDE([Volume Vendido],1000),"#,0")» <small>mil un</small></b></div>
+
+<div class='mt'><i>Preço médio</i><b>R$ «FORMAT([Preço Médio (R$/un)],"#,0.00")»</b></div>
+
+<div class='mt'><i>Contratos</i><b>«FORMAT([Nº Contratos],"#,0")»</b></div>
+
+<div class='mt'><i>Ticket médio</i><b>«"R$ " & FORMAT ( DIVIDE ( [Ticket Médio por Contrato], 1000000 ), "#,0.00" ) & " mi"»</b></div>
+
+<div class='mt'><i>«_lblVar»</i><b>«_chipVar»</b></div>
+</div>
+
+<div class='in'>«_insight»</div></div>

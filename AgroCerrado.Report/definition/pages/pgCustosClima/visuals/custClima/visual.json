@@ -1,0 +1,479 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "custClima",
+  "position": {
+    "x": 24,
+    "y": 210,
+    "z": 1020,
+    "height": 486,
+    "width": 620,
+    "tabOrder": 1020
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Regiao"
+                    }
+                  },
+                  "Property": "UF"
+                }
+              },
+              "queryRef": "Dim_Regiao.UF",
+              "nativeQueryRef": "UF"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Tempo"
+                    }
+                  },
+                  "Property": "Safra"
+                }
+              },
+              "queryRef": "Dim_Tempo.Safra",
+              "nativeQueryRef": "Safra"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Chuva Média Mensal (mm)"
+                }
+              },
+              "queryRef": "_Medidas.Chuva Média Mensal (mm)",
+              "nativeQueryRef": "Chuva Média Mensal (mm)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Produtividade Média (sc/ha)"
+                }
+              },
+              "queryRef": "_Medidas.Produtividade Média (sc/ha)",
+              "nativeQueryRef": "Produtividade Média (sc/ha)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Medidas"
+                    }
+                  },
+                  "Property": "Área Grãos (ha)"
+                }
+              },
+              "queryRef": "_Medidas.Área Grãos (ha)",
+              "nativeQueryRef": "Área Grãos (ha)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vegaLite'"
+                }
+              }
+            },
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\n  \"data\": {\n    \"name\": \"dataset\"\n  },\n  \"transform\": [\n    {\n      \"filter\": \"isValid(datum[''Chuva Média Mensal (mm)'']) && isValid(datum[''Produtividade Média (sc/ha)''])\"\n    }\n  ],\n  \"layer\": [\n    {\n      \"transform\": [\n        {\n          \"regression\": \"Produtividade Média (sc/ha)\",\n          \"on\": \"Chuva Média Mensal (mm)\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"line\",\n        \"color\": \"#C9A227\",\n        \"strokeDash\": [\n          6,\n          5\n        ],\n        \"strokeWidth\": 2.2\n      },\n      \"encoding\": {\n        \"x\": {\n          \"field\": \"Chuva Média Mensal (mm)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"zero\": false,\n            \"nice\": true\n          },\n          \"axis\": {\n            \"title\": \"Chuva média mensal (mm)\",\n            \"grid\": true,\n            \"tickCount\": 6\n          }\n        },\n        \"y\": {\n          \"field\": \"Produtividade Média (sc/ha)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"zero\": false,\n            \"nice\": true\n          },\n          \"axis\": {\n            \"title\": \"Produtividade de grãos (sc/ha)\",\n            \"grid\": true,\n            \"tickCount\": 6\n          }\n        }\n      }\n    },\n    {\n      \"mark\": {\n        \"type\": \"circle\",\n        \"opacity\": 0.92,\n        \"stroke\": \"#FFFFFF\",\n        \"strokeWidth\": 2,\n        \"tooltip\": true\n      },\n      \"encoding\": {\n        \"x\": {\n          \"field\": \"Chuva Média Mensal (mm)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"zero\": false,\n            \"nice\": true\n          },\n          \"axis\": {\n            \"title\": \"Chuva média mensal (mm)\",\n            \"grid\": true,\n            \"tickCount\": 6\n          }\n        },\n        \"y\": {\n          \"field\": \"Produtividade Média (sc/ha)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"zero\": false,\n            \"nice\": true\n          },\n          \"axis\": {\n            \"title\": \"Produtividade de grãos (sc/ha)\",\n            \"grid\": true,\n            \"tickCount\": 6\n          }\n        },\n        \"size\": {\n          \"field\": \"Área Grãos (ha)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"range\": [\n              180,\n              1100\n            ]\n          },\n          \"legend\": null\n        },\n        \"color\": {\n          \"field\": \"Safra\",\n          \"type\": \"ordinal\",\n          \"scale\": {\n            \"range\": [\n              \"#A5D6A7\",\n              \"#2E7D32\",\n              \"#1B5E20\",\n              \"#C9A227\"\n            ]\n          },\n          \"legend\": {\n            \"title\": \"Safra\",\n            \"orient\": \"top\",\n            \"direction\": \"horizontal\",\n            \"symbolSize\": 120\n          }\n        }\n      }\n    },\n    {\n      \"mark\": {\n        \"type\": \"text\",\n        \"tooltip\": true,\n        \"fontSize\": 9.5,\n        \"fontWeight\": 800,\n        \"color\": \"#1B3A12\",\n        \"baseline\": \"bottom\",\n        \"dy\": -11\n      },\n      \"encoding\": {\n        \"x\": {\n          \"field\": \"Chuva Média Mensal (mm)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"zero\": false,\n            \"nice\": true\n          },\n          \"axis\": {\n            \"title\": \"Chuva média mensal (mm)\",\n            \"grid\": true,\n            \"tickCount\": 6\n          }\n        },\n        \"y\": {\n          \"field\": \"Produtividade Média (sc/ha)\",\n          \"type\": \"quantitative\",\n          \"scale\": {\n            \"zero\": false,\n            \"nice\": true\n          },\n          \"axis\": {\n            \"title\": \"Produtividade de grãos (sc/ha)\",\n            \"grid\": true,\n            \"tickCount\": 6\n          }\n        },\n        \"text\": {\n          \"field\": \"UF\"\n        }\n      }\n    },\n    {\n      \"transform\": [\n        {\n          \"regression\": \"Produtividade Média (sc/ha)\",\n          \"on\": \"Chuva Média Mensal (mm)\",\n          \"params\": true\n        },\n        {\n          \"calculate\": \"''R² = '' + format(datum.rSquared, ''.2f'') + ''  ·  tendência linear''\",\n          \"as\": \"r2\"\n        }\n      ],\n      \"mark\": {\n        \"type\": \"text\",\n        \"tooltip\": true,\n        \"align\": \"right\",\n        \"baseline\": \"top\",\n        \"x\": {\n          \"expr\": \"width\"\n        },\n        \"y\": 2,\n        \"fontSize\": 10,\n        \"fontWeight\": 700,\n        \"color\": \"#8A7A40\"\n      },\n      \"encoding\": {\n        \"text\": {\n          \"field\": \"r2\"\n        }\n      }\n    }\n  ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"autosize\": {\n    \"type\": \"fit\",\n    \"contains\": \"padding\"\n  },\n  \"view\": {\n    \"stroke\": \"transparent\"\n  },\n  \"font\": \"Segoe UI\",\n  \"padding\": 6,\n  \"axis\": {\n    \"domain\": false,\n    \"ticks\": false,\n    \"labelColor\": \"#5F6B5F\",\n    \"labelFontSize\": 10,\n    \"titleColor\": \"#5F6B5F\",\n    \"titleFontSize\": 10,\n    \"titleFontWeight\": 600,\n    \"gridColor\": \"#EEEAE0\",\n    \"labelFont\": \"Segoe UI\",\n    \"titleFont\": \"Segoe UI\"\n  },\n  \"legend\": {\n    \"labelColor\": \"#5F6B5F\",\n    \"titleColor\": \"#5F6B5F\",\n    \"labelFontSize\": 10,\n    \"titleFontSize\": 10,\n    \"titleFontWeight\": 600,\n    \"symbolStrokeWidth\": 0\n  },\n  \"text\": {\n    \"font\": \"Segoe UI\",\n    \"color\": \"#333333\"\n  }\n}'"
+                }
+              }
+            },
+            "renderMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'svg'"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableHighlight": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Clima × produtividade por estado e safra'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1B5E20'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E8E2CF'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "16D"
+                }
+              }
+            },
+            "width": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0E2A12'"
+                    }
+                  }
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Outer'"
+                }
+              }
+            },
+            "preset": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Custom'"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "88D"
+                }
+              }
+            },
+            "shadowBlur": {
+              "expr": {
+                "Literal": {
+                  "Value": "18D"
+                }
+              }
+            },
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "angle": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bolha = área de grãos · linha dourada = tendência linear'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#6B756B'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Canvas'"
+                }
+              }
+            },
+            "section": {
+              "expr": {
+                "Literal": {
+                  "Value": "'ttCustos'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Clima × produtividade por estado e safra'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

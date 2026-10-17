@@ -1,0 +1,81 @@
+table Fato_Clima
+	lineageTag: 06373fea-89ca-5789-941e-4fde4577bf4c
+
+	column ClimaKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: eee4b421-ff7e-512a-9b33-632311aa94fc
+		summarizeBy: none
+		sourceColumn: ClimaKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DataKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: f38c3885-4f43-5679-bb2d-6a960f8b4947
+		summarizeBy: none
+		sourceColumn: DataKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column RegiaoKey
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 9ff84aed-90ac-564c-be56-250c54a9ac9d
+		summarizeBy: none
+		sourceColumn: RegiaoKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrecipitacaoMm
+		dataType: double
+		lineageTag: 89f212d5-2ed0-54f1-8dc4-cac439344c97
+		summarizeBy: sum
+		sourceColumn: PrecipitacaoMm
+
+		annotation SummarizationSetBy = Automatic
+
+	column TempMediaC
+		dataType: double
+		lineageTag: f3fc31a7-8bc6-592a-87bd-efd8ed7993f8
+		summarizeBy: sum
+		sourceColumn: TempMediaC
+
+		annotation SummarizationSetBy = Automatic
+
+	column UmidadeRelativa
+		dataType: double
+		lineageTag: 37eb5074-5af2-51e4-a409-c038f0cd679e
+		summarizeBy: sum
+		sourceColumn: UmidadeRelativa
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiasChuva
+		dataType: int64
+		formatString: 0
+		lineageTag: 2e43d286-e20f-5a74-aba3-582e30ef1814
+		summarizeBy: none
+		sourceColumn: DiasChuva
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Clima = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents(CaminhoBase), null, true),
+				    Planilha = Fonte{[Item="Fato_Clima",Kind="Sheet"]}[Data],
+				    SemTitulo = Table.Skip(Planilha, 2),
+				    Cabecalhos = Table.PromoteHeaders(SemTitulo, [PromoteAllScalars=true]),
+				    Colunas = Table.SelectColumns(Cabecalhos, {"ClimaKey", "DataKey", "RegiaoKey", "PrecipitacaoMm", "TempMediaC", "UmidadeRelativa", "DiasChuva"}),
+				    SemVazios = Table.SelectRows(Colunas, each [ClimaKey] <> null),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"ClimaKey", Int64.Type}, {"DataKey", Int64.Type}, {"RegiaoKey", Int64.Type}, {"PrecipitacaoMm", type number}, {"TempMediaC", type number}, {"UmidadeRelativa", type number}, {"DiasChuva", Int64.Type}})
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
