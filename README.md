@@ -1,5 +1,12 @@
 # 🌾 AgroCerrado S.A. — Inteligência de Safra
 
+<!-- portfolio-link:start -->
+[![Ver no portfólio](https://img.shields.io/badge/Ver%20o%20painel%20no%20portf%C3%B3lio-Bocardi%20Data-6C3BAA?style=for-the-badge)](https://bocardidata.base44.app/ProjectDetail?id=inteligencia-safra-agrocerrado)
+
+> 🔗 **Quer ver o visual do Power BI?** Acesse a página do projeto no portfólio: **[https://bocardidata.base44.app/ProjectDetail?id=inteligencia-safra-agrocerrado](https://bocardidata.base44.app/ProjectDetail?id=inteligencia-safra-agrocerrado)**
+<!-- portfolio-link:end -->
+
+
 > *“Cultivar o futuro do Cerrado com excelência e responsabilidade.”*
 
 Projeto **Power BI (PBIP · PBIR + TMDL)** de padrão consultoria para uma produtora de grãos fictícia no Cerrado brasileiro — soja, milho, sorgo e algodão em 10 fazendas (MT, GO, MS, BA e MG), dados de 2024 a 2026.
